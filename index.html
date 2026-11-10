@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Окошко - демо онлайн-записи</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: заголовок, затем рядом "телефон клиента" и "панель владельца", ниже выгоды и предложение */
+:root {
+  --bg: #f3f5f8;
+  --surface: #ffffff;
+  --ink: #18202b;
+  --muted: #5d6877;
+  --line: #dde3ea;
+  --accent: #2481cc;
+  --accent-soft: #e3f0fb;
+  --new: #1f9d63;
+  --new-soft: #e2f5ec;
+  --busy: #eef1f5;
+  --font-display: "Manrope", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161d; --surface: #1a212b; --ink: #e8edf3; --muted: #9aa6b5; --line: #2c3643;
+    --accent: #4ea3e8; --accent-soft: #1d3247; --new: #3cc488; --new-soft: #183528; --busy: #232c38;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161d; --surface: #1a212b; --ink: #e8edf3; --muted: #9aa6b5; --line: #2c3643;
+  --accent: #4ea3e8; --accent-soft: #1d3247; --new: #3cc488; --new-soft: #183528; --busy: #232c38;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 32px 20px 56px; display: grid; gap: 32px; }
+
+header { display: grid; gap: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 800; font-size: 20px; }
+.logo { width: 32px; height: 32px; border-radius: 9px; background: var(--accent); display: grid; place-items: center; }
+.logo span { width: 14px; height: 14px; border: 2.5px solid #fff; border-radius: 3px; }
+.tag { font-family: var(--font-body); font-weight: 600; font-size: 12px; color: var(--accent); background: var(--accent-soft); padding: 2px 8px; border-radius: 99px; }
+h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(26px, 4vw, 38px); line-height: 1.15; margin: 0; text-wrap: balance; max-width: 22ch; }
+.lead { color: var(--muted); margin: 0; max-width: 62ch; font-size: 16px; }
+.note { font-size: 13px; color: var(--muted); margin: 0; }
+
+.stage { display: grid; grid-template-columns: 360px 1fr; gap: 24px; align-items: start; }
+@media (max-width: 880px) { .stage { grid-template-columns: 1fr; justify-items: center; } .admin { width: 100%; } }
+.label { font-family: var(--font-display); font-weight: 700; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+
+/* Телефон */
+.phone { width: 360px; max-width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 28px; padding: 10px; box-shadow: 0 10px 30px rgba(20,40,70,.10); }
+.screen { border-radius: 20px; overflow: hidden; background: var(--bg); min-height: 600px; display: flex; flex-direction: column; }
+.tg-bar { background: var(--surface); border-bottom: 1px solid var(--line); padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+.tg-bar .ava { width: 34px; height: 34px; border-radius: 50%; background: #2f3b4a; color: #fff; display: grid; place-items: center; font-weight: 700; font-family: var(--font-display); }
+.tg-bar b { display: block; font-size: 14px; }
+.tg-bar small { color: var(--muted); font-size: 12px; }
+.back { border: 0; background: none; color: var(--accent); padding: 4px 6px 4px 0; font-size: 14px; }
+.steps { display: flex; gap: 4px; padding: 10px 14px 0; }
+.steps i { flex: 1; height: 3px; border-radius: 3px; background: var(--line); }
+.steps i.on { background: var(--accent); }
+.body { padding: 14px; display: grid; gap: 10px; align-content: start; flex: 1; }
+.body h2 { font-family: var(--font-display); font-size: 17px; margin: 0; }
+.opt { display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+.opt:hover { border-color: var(--accent); }
+.opt .t { font-weight: 600; }
+.opt .s { font-size: 13px; color: var(--muted); }
+.opt .p { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.master-ava { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: #fff; flex: none; }
+.row { display: flex; align-items: center; gap: 10px; }
+.dates { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+.date { flex: none; width: 50px; padding: 6px 0; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); text-align: center; font-size: 12px; color: var(--muted); }
+.date b { display: block; font-size: 16px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.date.sel { background: var(--accent); border-color: var(--accent); color: #fff; }
+.date.sel b { color: #fff; }
+.slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.slot { padding: 8px 0; border-radius: 9px; border: 1px solid var(--line); background: var(--surface); font-variant-numeric: tabular-nums; font-weight: 500; }
+.slot:hover { border-color: var(--accent); color: var(--accent); }
+.empty { font-size: 13px; color: var(--muted); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 6px; font-size: 14px; }
+.card div { display: flex; justify-content: space-between; gap: 10px; }
+.card span:first-child { color: var(--muted); }
+.field { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+.field input, .field textarea { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; font-size: 14px; resize: none; }
+.attach { border: 1px dashed var(--line); background: none; border-radius: 10px; padding: 9px; font-size: 13px; color: var(--muted); }
+.attach.done { border-style: solid; color: var(--new); border-color: var(--new); }
+.main-btn { margin-top: auto; border: 0; background: var(--accent); color: #fff; font-weight: 600; border-radius: 12px; padding: 13px; font-size: 15px; }
+.chat { display: grid; gap: 8px; }
+.bubble { background: var(--surface); border: 1px solid var(--line); border-radius: 14px 14px 14px 4px; padding: 10px 12px; font-size: 14px; max-width: 92%; }
+.bubble small { display: block; color: var(--muted); font-size: 11px; margin-top: 4px; }
+.bubble .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+.bubble .btns span { text-align: center; background: var(--accent-soft); color: var(--accent); border-radius: 8px; padding: 6px; font-size: 13px; font-weight: 600; }
+.ok { display: flex; align-items: center; gap: 10px; }
+.ok i { width: 36px; height: 36px; border-radius: 50%; background: var(--new); flex: none; position: relative; }
+.ok i::after { content: ""; position: absolute; left: 13px; top: 8px; width: 8px; height: 15px; border: solid #fff; border-width: 0 3px 3px 0; transform: rotate(45deg); }
+.ghost { border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 11px; font-weight: 500; }
+
+/* Панель владельца */
+.admin { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+.admin-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.admin-top b { font-family: var(--font-display); font-size: 16px; }
+.tabs { display: flex; gap: 4px; background: var(--bg); padding: 3px; border-radius: 10px; }
+.tabs button { border: 0; background: none; padding: 6px 12px; border-radius: 8px; font-size: 14px; color: var(--muted); }
+.tabs button.on { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border-bottom: 1px solid var(--line); }
+.tile { background: var(--surface); padding: 12px 18px; }
+.tile small { color: var(--muted); font-size: 12px; display: block; }
+.tile b { font-family: var(--font-display); font-size: 22px; font-variant-numeric: tabular-nums; }
+.daybar { display: flex; justify-content: space-between; align-items: center; padding: 10px 18px; font-size: 14px; color: var(--muted); }
+.daybar b { color: var(--ink); }
+.cal-wrap { max-height: 520px; overflow-y: auto; border-top: 1px solid var(--line); }
+.cal { display: grid; grid-template-columns: 52px 1fr 1fr; position: relative; }
+.cal-head { display: contents; }
+.cal-head div { position: sticky; top: 0; background: var(--surface); z-index: 2; padding: 8px 10px; font-weight: 600; font-size: 14px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 8px; }
+.cal-head .mini { width: 22px; height: 22px; border-radius: 50%; color: #fff; font-size: 11px; display: grid; place-items: center; }
+.times { position: relative; }
+.times, .col { margin: 10px 0; }
+.times span { position: absolute; right: 8px; font-size: 11px; color: var(--muted); transform: translateY(-50%); font-variant-numeric: tabular-nums; }
+.col { position: relative; border-left: 1px solid var(--line); background-image: repeating-linear-gradient(to bottom, var(--line) 0 1px, transparent 1px 48px); }
+.col.off { background-color: var(--busy); }
+.col .offtxt { position: absolute; inset: 40px 0 auto; text-align: center; font-size: 13px; color: var(--muted); }
+.appt { position: absolute; left: 6px; right: 6px; border-radius: 8px; padding: 4px 8px; font-size: 12px; line-height: 1.3; background: var(--accent-soft); border-left: 3px solid var(--accent); overflow: hidden; }
+.appt b { font-size: 12.5px; display: block; }
+.appt.new { background: var(--new-soft); border-left-color: var(--new); animation: pop .5s ease; }
+.appt .chip { display: inline-block; background: var(--new); color: #fff; font-size: 10px; font-weight: 700; padding: 0 5px; border-radius: 4px; margin-left: 4px; vertical-align: 1px; }
+@keyframes pop { from { transform: scale(.94); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .appt.new { animation: none; } }
+.toast { margin: 0 18px 12px; padding: 10px 12px; border-radius: 10px; background: var(--new-soft); color: var(--ink); font-size: 14px; border: 1px solid var(--new); display: none; }
+.toast.show { display: block; }
+.bc { padding: 18px; display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 640px) { .bc { grid-template-columns: 1fr; } .tiles { grid-template-columns: 1fr 1fr; } .tile:last-child { grid-column: span 2; } }
+.bc .field select, .bc .field textarea { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; font-size: 14px; }
+.bc .preview { background: var(--bg); border-radius: 14px; padding: 14px; display: grid; gap: 8px; align-content: start; }
+.bc .status { font-size: 13px; color: var(--new); min-height: 20px; }
+
+/* Выгоды и предложение */
+.benefits { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+@media (max-width: 880px) { .benefits { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .benefits { grid-template-columns: 1fr; } }
+.benefit { border-top: 2px solid var(--accent); padding-top: 12px; }
+.benefit h3 { font-family: var(--font-display); font-size: 16px; margin: 0 0 4px; }
+.benefit p { margin: 0; color: var(--muted); font-size: 14px; }
+.offer { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 24px; display: grid; gap: 8px; }
+.offer h2 { font-family: var(--font-display); font-size: 22px; margin: 0; text-wrap: balance; }
+.offer p { margin: 0; color: var(--muted); max-width: 64ch; }
+.offer .price { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 8px; }
+.offer .price div { font-size: 14px; color: var(--muted); }
+.offer .price b { display: block; font-family: var(--font-display); font-size: 20px; color: var(--ink); font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><div class="logo"><span></span></div>Окошко <span class="tag">демо</span></div>
+    <h1>Онлайн-запись в ваш барбершоп прямо в Telegram</h1>
+    <p class="lead">Попробуйте сами: запишитесь как клиент в телефоне слева, и запись тут же появится в панели владельца справа. Клиенту ничего не нужно скачивать, вам не нужно отвечать на сообщения «а есть окошко на завтра?».</p>
+    <p class="note">Это демонстрация. Барбершоп «Север», мастера и клиенты вымышленные, сообщения никуда не отправляются.</p>
+  </header>
+
+  <section class="stage">
+    <div>
+      <p class="label">Так видит клиент</p>
+      <div class="phone"><div class="screen" id="screen"></div></div>
+    </div>
+    <div class="admin">
+      <div class="admin-top">
+        <b>Панель владельца · Север</b>
+        <div class="tabs" role="tablist">
+          <button id="tab-cal" class="on" role="tab" aria-selected="true">Записи</button>
+          <button id="tab-bc" role="tab" aria-selected="false">Рассылка</button>
+        </div>
+      </div>
+      <div id="view-cal">
+        <div class="tiles">
+          <div class="tile"><small>Записей на день</small><b id="t-count">0</b></div>
+          <div class="tile"><small>Ожидаемая выручка</small><b id="t-sum">0 ₽</b></div>
+          <div class="tile"><small>Клиентов в базе</small><b>148</b></div>
+        </div>
+        <div class="daybar"><span>Расписание на <b id="day-name"></b></span><span>шаг сетки 30 мин</span></div>
+        <div class="toast" id="toast" role="status"></div>
+        <div class="cal-wrap"><div class="cal" id="cal"></div></div>
+      </div>
+      <div id="view-bc" hidden>
+        <div class="bc">
+          <div style="display:grid;gap:12px;align-content:start">
+            <label class="field" for="bc-seg">Кому отправить
+              <select id="bc-seg">
+                <option value="148">Все клиенты · 148</option>
+                <option value="37" selected>Не были больше 30 дней · 37</option>
+                <option value="71">Клиенты Артёма · 71</option>
+              </select>
+            </label>
+            <label class="field" for="bc-text">Текст сообщения
+              <textarea id="bc-text" rows="5">Давно не виделись! До конца недели стрижка в будни до 14:00 со скидкой 20%. Записаться можно прямо здесь, это займет минуту.</textarea>
+            </label>
+            <button class="main-btn" id="bc-send">Отправить</button>
+            <div class="status" id="bc-status" role="status"></div>
+          </div>
+          <div class="preview">
+            <p class="label" style="margin:0">Как увидит клиент</p>
+            <div class="bubble"><span id="bc-prev"></span><div class="btns"><span>Записаться</span><span>Отписаться</span></div><small>Барбершоп Север</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="benefits">
+    <div class="benefit"><h3>Запись в 3 касания</h3><p>Клиент выбирает услугу, мастера и время в Telegram, где он и так сидит. Без приложений и регистрации.</p></div>
+    <div class="benefit"><h3>Напоминания сами</h3><p>Бот пишет клиенту за день и за 2 часа до визита. Если планы поменялись, он переносит запись сам, а окно освобождается.</p></div>
+    <div class="benefit"><h3>Рассылки по базе</h3><p>Акции и «давно не были» тем, кто действительно давно не был. С кнопкой записи прямо в сообщении.</p></div>
+    <div class="benefit"><h3>Все записи в одном месте</h3><p>Календарь по мастерам с телефона или компьютера. Видно, кто записан, на что и с каким пожеланием.</p></div>
+  </section>
+
+  <section class="offer">
+    <h2>Первым барбершопам - 3 месяца бесплатно</h2>
+    <p>Подключение и настройку услуг, мастеров и графика делаем за вас. Нужны только список услуг с ценами и расписание мастеров. Если не понравится, просто отключаетесь, без договоров на год.</p>
+    <div class="price">
+      <div><b>0 ₽</b>первые 3 месяца</div>
+      <div><b>от 590 ₽/мес</b>дальше, без процентов с записей</div>
+      <div><b>10 минут</b>на подключение</div>
+    </div>
+    <p style="margin-top:8px;color:var(--ink)">Интересно? Ответьте на сообщение, в котором пришла эта ссылка, и я подключу ваш барбершоп.</p>
+  </section>
+</div>
+
+<script>
+(function () {
+  const SERVICES = [
+    { id: "cut", name: "Мужская стрижка", dur: 60, price: 1500 },
+    { id: "combo", name: "Стрижка + борода", dur: 90, price: 2200 },
+    { id: "beard", name: "Оформление бороды", dur: 30, price: 900 },
+    { id: "kid", name: "Детская стрижка", dur: 45, price: 1100 }
+  ];
+  const MASTERS = [
+    { id: "artem", name: "Артём", info: "Top-барбер, 6 лет опыта", color: "#2f6fb3", off: [] },
+    { id: "ilya", name: "Илья", info: "Барбер, фейды и бороды", color: "#8a5a2b", off: [1] }
+  ];
+  const OPEN = 10 * 60, CLOSE = 21 * 60, PX = 1.6; // 48px на 30 минут
+  const DOW = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
+  const DOW_FULL = ["воскресенье", "понедельник", "вторник", "среду", "четверг", "пятницу", "субботу"];
+  const MON = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+
+  const days = [];
+  const base = new Date(); base.setHours(12, 0, 0, 0);
+  for (let i = 1; i <= 7; i++) { const d = new Date(base); d.setDate(base.getDate() + i); days.push(d); }
+
+  const SEED = {
+    artem: [[600, 60, "Денис", "cut"], [690, 90, "Михаил", "combo"], [840, 60, "Олег", "cut"], [960, 30, "Сергей", "beard"], [1080, 60, "Андрей", "cut"], [1170, 90, "Глеб", "combo"]],
+    ilya: [[630, 60, "Павел", "cut"], [780, 45, "Тимур, 8 лет", "kid"], [900, 90, "Роман", "combo"], [1050, 30, "Егор", "beard"], [1170, 60, "Кирилл", "cut"]]
+  };
+  const bookings = [];
+  days.forEach((d, di) => {
+    MASTERS.forEach(m => {
+      if (m.off.includes(d.getDay())) return;
+      SEED[m.id].forEach((b, i) => {
+        if ((i + di) % 3 === 0) return;
+        bookings.push({ day: di, master: m.id, start: b[0], dur: b[1], client: b[2], service: b[3], isNew: false });
+      });
+    });
+  });
+
+  const st = { step: 0, service: null, master: null, day: 0, time: null, photo: false };
+  const screen = document.getElementById("screen");
+  const fmt = m => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
+  const rub = n => n.toLocaleString("ru-RU").replace(/ /g, " ") + " ₽";
+  const svc = id => SERVICES.find(s => s.id === id);
+  const mst = id => MASTERS.find(m => m.id === id);
+  const dayLabel = di => days[di].getDate() + " " + MON[days[di].getMonth()];
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  function works(mid, di) { return !mst(mid).off.includes(days[di].getDay()); }
+  function freeFor(mid, di, start, dur) {
+    if (!works(mid, di)) return false;
+    return !bookings.some(b => b.day === di && b.master === mid && start < b.start + b.dur && b.start < start + dur);
+  }
+  function slots(di) {
+    const dur = svc(st.service).dur, out = [];
+    for (let t = OPEN; t + dur <= CLOSE; t += 30) {
+      const ms = st.master === "any" ? MASTERS.map(m => m.id) : [st.master];
+      if (ms.some(m => freeFor(m, di, t, dur))) out.push(t);
+    }
+    return out;
+  }
+
+  function shell(title, inner, canBack) {
+    const bars = [0, 1, 2, 3].map(i => `<i class="${i <= st.step ? "on" : ""}"></i>`).join("");
+    screen.innerHTML = `
+      <div class="tg-bar">${canBack ? '<button class="back" id="back">‹ Назад</button>' : ""}<div class="ava">С</div><div><b>Барбершоп Север</b><small>мини-приложение</small></div></div>
+      ${st.step < 4 ? `<div class="steps">${bars}</div>` : ""}
+      <div class="body"><h2>${title}</h2>${inner}</div>`;
+    const back = document.getElementById("back");
+    if (back) back.onclick = () => { st.step--; render(); };
+  }
+
+  function render() {
+    if (st.step === 0) {
+      shell("Выберите услугу", SERVICES.map(s => `
+        <button class="opt" data-s="${s.id}"><span><span class="t">${s.name}</span><br><span class="s">${s.dur} мин</span></span><span class="p">${rub(s.price)}</span></button>`).join(""), false);
+      screen.querySelectorAll("[data-s]").forEach(b => b.onclick = () => { st.service = b.dataset.s; st.step = 1; render(); });
+    } else if (st.step === 1) {
+      shell("Выберите мастера", MASTERS.map(m => `
+        <button class="opt" data-m="${m.id}"><span class="row"><span class="master-ava" style="background:${m.color}">${m.name[0]}</span><span><span class="t">${m.name}</span><br><span class="s">${m.info}</span></span></span></button>`).join("") +
+        `<button class="opt" data-m="any"><span class="row"><span class="master-ava" style="background:#7a8696">?</span><span><span class="t">Любой мастер</span><br><span class="s">Покажем больше свободного времени</span></span></span></button>`, true);
+      screen.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { st.master = b.dataset.m; st.step = 2; render(); });
+    } else if (st.step === 2) {
+      const dates = days.map((d, i) => `<button class="date ${i === st.day ? "sel" : ""}" data-d="${i}">${DOW[d.getDay()]}<b>${d.getDate()}</b></button>`).join("");
+      const sl = slots(st.day);
+      const off = st.master !== "any" && !works(st.master, st.day);
+      const grid = off ? `<p class="empty">${mst(st.master).name} в этот день не работает. Выберите другой день.</p>`
+        : sl.length ? `<div class="slots">${sl.map(t => `<button class="slot" data-t="${t}">${fmt(t)}</button>`).join("")}</div>`
+        : `<p class="empty">Свободного времени нет. Выберите другой день.</p>`;
+      shell("Дата и время", `<div class="dates">${dates}</div>${grid}`, true);
+      screen.querySelectorAll("[data-d]").forEach(b => b.onclick = () => { st.day = +b.dataset.d; render(); syncAdmin(); });
+      screen.querySelectorAll("[data-t]").forEach(b => b.onclick = () => { st.time = +b.dataset.t; st.step = 3; render(); });
+    } else if (st.step === 3) {
+      const s = svc(st.service);
+      const mName = st.master === "any" ? "Любой мастер" : mst(st.master).name;
+      shell("Проверьте запись", `
+        <div class="card">
+          <div><span>Услуга</span><span>${s.name}</span></div>
+          <div><span>Мастер</span><span>${mName}</span></div>
+          <div><span>Когда</span><span>${DOW[days[st.day].getDay()]}, ${dayLabel(st.day)}, ${fmt(st.time)}</span></div>
+          <div><span>Стоимость</span><span>${rub(s.price)}</span></div>
+        </div>
+        <label class="field" for="c-name">Имя (взяли из Telegram)<input id="c-name" value="Алексей"></label>
+        <label class="field" for="c-com">Пожелание мастеру<textarea id="c-com" rows="2" placeholder="Например: сверху оставить длину"></textarea></label>
+        <button class="attach ${st.photo ? "done" : ""}" id="c-photo">${st.photo ? "Фото-референс прикреплено" : "+ Прикрепить фото желаемой стрижки"}</button>
+        <button class="main-btn" id="confirm">Записаться</button>`, true);
+      document.getElementById("c-photo").onclick = () => { st.photo = !st.photo; const b = document.getElementById("c-photo"); b.classList.toggle("done", st.photo); b.textContent = st.photo ? "Фото-референс прикреплено" : "+ Прикрепить фото желаемой стрижки"; };
+      document.getElementById("confirm").onclick = confirm;
+    } else {
+      const b = bookings[bookings.length - 1], s = svc(b.service);
+      screen.innerHTML = `
+        <div class="tg-bar"><div class="ava">С</div><div><b>Барбершоп Север</b><small>бот</small></div></div>
+        <div class="body">
+          <div class="ok"><i></i><h2>Вы записаны</h2></div>
+          <div class="chat">
+            <div class="bubble">Готово! ${esc(b.client)}, ждем вас ${DOW_FULL[days[b.day].getDay()] === "вторник" ? "во" : "в"} ${DOW_FULL[days[b.day].getDay()]}, ${dayLabel(b.day)}, в ${fmt(b.start)}.<br>${s.name}, мастер ${mst(b.master).name}. Адрес: ул. Северная, 12.<small>сейчас</small></div>
+            <div class="bubble">Напоминание: завтра в ${fmt(b.start)} у вас ${s.name.toLowerCase()} у мастера ${mst(b.master).name}.<div class="btns"><span>Приду</span><span>Перенести</span></div><small>придет за день до визита</small></div>
+            <div class="bubble">Как вам визит? Оцените мастера от 1 до 5.<small>придет после визита</small></div>
+          </div>
+          <button class="ghost" id="again">Записаться еще раз</button>
+        </div>`;
+      document.getElementById("again").onclick = () => { st.step = 0; st.photo = false; render(); };
+    }
+  }
+
+  function confirm() {
+    const s = svc(st.service);
+    let mid = st.master;
+    if (mid === "any") mid = MASTERS.map(m => m.id).find(m => freeFor(m, st.day, st.time, s.dur));
+    const name = (document.getElementById("c-name").value || "Клиент").trim().slice(0, 30);
+    const comment = document.getElementById("c-com").value.trim().slice(0, 60);
+    bookings.forEach(b => b.isNew = false);
+    bookings.push({ day: st.day, master: mid, start: st.time, dur: s.dur, client: name, service: s.id, isNew: true, comment, photo: st.photo });
+    st.step = 4;
+    render();
+    showTab("cal");
+    syncAdmin();
+    const t = document.getElementById("toast");
+    t.textContent = `Новая запись: ${name}, ${s.name.toLowerCase()}, ${dayLabel(st.day)} в ${fmt(st.time)}, мастер ${mst(mid).name}. Уведомление ушло мастеру в Telegram.`;
+    t.classList.add("show");
+    const el = document.querySelector(".appt.new");
+    if (el) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+
+  function syncAdmin() {
+    const di = st.day;
+    const list = bookings.filter(b => b.day === di);
+    document.getElementById("t-count").textContent = list.length;
+    document.getElementById("t-sum").textContent = rub(list.reduce((a, b) => a + svc(b.service).price, 0));
+    document.getElementById("day-name").textContent = DOW[days[di].getDay()] + ", " + dayLabel(di);
+    const H = (CLOSE - OPEN) * PX;
+    let html = `<div class="cal-head"><div></div>${MASTERS.map(m => `<div><span class="mini" style="background:${m.color}">${m.name[0]}</span>${m.name}</div>`).join("")}</div>`;
+    let times = "";
+    for (let t = OPEN; t <= CLOSE; t += 60) times += `<span style="top:${(t - OPEN) * PX}px">${fmt(t)}</span>`;
+    html += `<div class="times" style="height:${H}px">${times}</div>`;
+    MASTERS.forEach(m => {
+      if (!works(m.id, di)) { html += `<div class="col off" style="height:${H}px"><div class="offtxt">Выходной</div></div>`; return; }
+      const items = list.filter(b => b.master === m.id).map(b => {
+        const s = svc(b.service), h = b.dur * PX - 3;
+        const extra = b.isNew ? `${b.comment ? "<br>«" + esc(b.comment) + "»" : ""}${b.photo ? "<br>есть фото-референс" : ""}` : "";
+        return `<div class="appt ${b.isNew ? "new" : ""}" style="top:${(b.start - OPEN) * PX + 1}px;height:${h}px"><b>${fmt(b.start)} ${esc(b.client)}${b.isNew ? '<span class="chip">НОВАЯ</span>' : ""}</b>${s.name}${extra}</div>`;
+      }).join("");
+      html += `<div class="col" style="height:${H}px">${items}</div>`;
+    });
+    document.getElementById("cal").innerHTML = html;
+  }
+
+  function showTab(which) {
+    const cal = which === "cal";
+    document.getElementById("view-cal").hidden = !cal;
+    document.getElementById("view-bc").hidden = cal;
+    document.getElementById("tab-cal").classList.toggle("on", cal);
+    document.getElementById("tab-bc").classList.toggle("on", !cal);
+    document.getElementById("tab-cal").setAttribute("aria-selected", cal);
+    document.getElementById("tab-bc").setAttribute("aria-selected", !cal);
+  }
+  document.getElementById("tab-cal").onclick = () => showTab("cal");
+  document.getElementById("tab-bc").onclick = () => showTab("bc");
+
+  const bcText = document.getElementById("bc-text"), bcPrev = document.getElementById("bc-prev");
+  const upd = () => { bcPrev.textContent = bcText.value || "…"; document.getElementById("bc-status").textContent = ""; };
+  bcText.oninput = upd; document.getElementById("bc-seg").onchange = upd; upd();
+  document.getElementById("bc-send").onclick = () => {
+    const n = document.getElementById("bc-seg").value;
+    document.getElementById("bc-status").textContent = `Готово: рассылка ушла бы ${n} клиентам. В демо сообщения никуда не отправляются.`;
+  };
+
+  render();
+  syncAdmin();
+})();
+</script>
+</body>
+</html>
