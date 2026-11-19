@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Чайная лавка Листок</title>
+<style>
+/* VOICE everyday retail: warm, tidy, trustworthy
+   IDEA a tea shop counter: tins and packs lined up on shelves
+   PICTURE each product drawn as its own tea tin in its colour
+   COLOUR paper #f7f3ea, deep green #1f4d3a, tin colours, accent saffron #e3a21a
+   TYPE Georgia-like serif for titles via system, sans for UI
+   LAYOUT top bar with search and cart, filters row, product grid; cart as side drawer */
+:root{color-scheme:light dark;--bg:light-dark(#f7f3ea,#14201b);--card:light-dark(#fff,#1c2b25);--ink:light-dark(#1d2a24,#ecf2ee);--mute:light-dark(#5e6d66,#a3b5ac);--green:light-dark(#1f4d3a,#7fc4a0);--acc:#e3a21a;--line:light-dark(#e4dccb,#2c4038)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip}
+.back{display:block;background:var(--green);color:var(--bg);text-align:center;font-size:14px;padding:6px;text-decoration:none}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:16px max(4vw,16px);border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:4}
+.logo{font:700 26px Georgia,"Times New Roman",serif;color:var(--green);margin-right:auto}
+input,select,textarea{font:inherit;font-size:16px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid var(--acc);outline-offset:1px}
+#q{width:min(320px,100%)}
+button{font:inherit;cursor:pointer;border-radius:10px;border:0;min-height:44px;padding:0 16px}
+.primary{background:var(--green);color:var(--bg);font-weight:700}
+.cartbtn{background:var(--acc);color:#1d1400;font-weight:700}
+.hero{padding:28px max(4vw,16px) 8px}
+h1{font:700 clamp(30px,4.4vw,46px)/1.05 Georgia,serif;margin:0 0 8px;letter-spacing:-.01em}
+.hero p{margin:0;color:var(--mute)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;padding:16px max(4vw,16px)}
+.chip{background:var(--card);border:1.5px solid var(--line);color:var(--ink)}
+.chip[aria-pressed=true]{background:var(--green);color:var(--bg);border-color:var(--green)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;padding:8px max(4vw,16px) 40px}
+.p{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.p svg{display:block;width:100%;height:190px}
+.p .b{padding:14px 16px 16px;display:flex;flex-direction:column;gap:4px;flex:1}
+.p h3{margin:0;font-size:17px}
+.p .m{color:var(--mute);font-size:14px;flex:1}
+.p .r{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:8px}
+.price{font-weight:800;font-size:19px;white-space:nowrap}
+.empty{padding:40px max(4vw,16px);color:var(--mute)}
+.drawer{position:fixed;inset:0 0 0 auto;width:min(420px,100%);background:var(--card);border-left:1px solid var(--line);transform:translateX(100%);transition:transform .25s;z-index:10;display:flex;flex-direction:column}
+.drawer.open{transform:none}
+.shade{position:fixed;inset:0;background:#0007;z-index:9;display:none}
+.shade.open{display:block}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:1px solid var(--line)}
+.items{flex:1;overflow:auto;padding:8px 16px}
+.it{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;padding:12px 0;border-bottom:1px solid var(--line)}
+.qty{display:flex;align-items:center;gap:6px}
+.qty button{min-height:36px;width:36px;padding:0;background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+.sum{padding:16px;border-top:1px solid var(--line);display:grid;gap:8px}
+.line{display:flex;justify-content:space-between}
+.form{display:grid;gap:10px;padding:16px}
+.err{color:#c0392b;font-size:14px;min-height:1em}
+.ok{padding:24px 16px}
+.note{font-size:13px;color:var(--mute);padding:0 max(4vw,16px) 24px}
+@media(prefers-reduced-motion:reduce){.drawer{transition:none}}
+</style>
+</head>
+<body>
+<a class="back" href="../index.html">← Демо-проект из портфолио. Вернуться к портфолио</a>
+<header>
+  <div class="logo">Листок</div>
+  <input id="q" type="search" placeholder="Поиск чая" aria-label="Поиск">
+  <select id="sort" aria-label="Сортировка"><option value="pop">Сначала популярные</option><option value="asc">Дешевле</option><option value="desc">Дороже</option></select>
+  <button class="cartbtn" id="openCart">Корзина <span id="cnt">0</span></button>
+</header>
+<section class="hero"><h1>Чай с плантаций Китая, Индии и Кении</h1><p>Бесплатная доставка от 2 000 ₽. Развешиваем в день заказа.</p></section>
+<div class="filters" id="filters"></div>
+<main class="grid" id="grid"></main>
+<p class="note">Демо-магазин: товары и цены вымышлены, заказ никуда не отправляется. Корзина сохраняется в вашем браузере.</p>
+
+<div class="shade" id="shade"></div>
+<aside class="drawer" id="drawer" aria-label="Корзина">
+  <div class="dh"><b style="font-size:20px">Корзина</b><button class="chip" id="closeCart">Закрыть</button></div>
+  <div class="items" id="items"></div>
+  <div class="sum" id="sum"></div>
+</aside>
+
+<script>
+{
+const PR=[
+ {id:1,n:"Да Хун Пао",c:"Улун",p:890,w:"100 г",col:"#a8462b",pop:9,d:"Сильно обжаренный улун с нотами какао и печёного яблока."},
+ {id:2,n:"Те Гуань Инь",c:"Улун",p:760,w:"100 г",col:"#5c8f4a",pop:8,d:"Цветочный зелёный улун, сладкое послевкусие."},
+ {id:3,n:"Ассам TGFOP",c:"Чёрный",p:420,w:"100 г",col:"#7a3b1d",pop:10,d:"Крепкий чёрный чай для утра, хорошо с молоком."},
+ {id:4,n:"Дарджилинг",c:"Чёрный",p:690,w:"100 г",col:"#b0703a",pop:7,d:"Лёгкий мускатный вкус, весенний сбор."},
+ {id:5,n:"Кенийский BP1",c:"Чёрный",p:290,w:"100 г",col:"#8b2f2f",pop:6,d:"Гранулированный, быстро заваривается, яркий настой."},
+ {id:6,n:"Сенча",c:"Зелёный",p:540,w:"100 г",col:"#4f9a3d",pop:8,d:"Японская классика: свежий травяной вкус."},
+ {id:7,n:"Би Ло Чунь",c:"Зелёный",p:820,w:"50 г",col:"#7fb04a",pop:5,d:"Нежные спиральки, фруктовый аромат."},
+ {id:8,n:"Шу Пуэр 2018",c:"Пуэр",p:980,w:"блин 357 г",col:"#4a2c1a",pop:7,d:"Выдержанный пуэр с землистым вкусом."},
+ {id:9,n:"Шен Пуэр",c:"Пуэр",p:1250,w:"блин 200 г",col:"#8a7a3a",pop:4,d:"Свежий и бодрящий, раскрывается со временем."},
+ {id:10,n:"Иван-чай",c:"Травяной",p:250,w:"100 г",col:"#b0476f",pop:6,d:"Ферментированный кипрей, без кофеина."},
+ {id:11,n:"Гайвань 150 мл",c:"Посуда",p:1490,w:"фарфор",col:"#3b6ea5",pop:5,d:"Для заваривания проливом, белый фарфор."},
+ {id:12,n:"Чахай",c:"Посуда",p:890,w:"стекло",col:"#4d8fa8",pop:3,d:"Сосуд, чтобы настой был ровным по крепости."}
+];
+const CATS=["Все",...new Set(PR.map(p=>p.c))];
+const FREE=2000,DEL=300;
+const rub=n=>n.toLocaleString("ru-RU")+" ₽";
+let cat="Все",q="",sort="pop";
+let cart={};try{cart=JSON.parse(localStorage.getItem("shop-cart")||"{}")}catch(e){}
+const save=()=>{try{localStorage.setItem("shop-cart",JSON.stringify(cart))}catch(e){}};
+const tin=(p)=>{const g=p.c==="Посуда";return `<svg viewBox="0 0 220 190" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="220" height="190" fill="color-mix(in srgb,${p.col} 14%,var(--card))"/><ellipse cx="110" cy="168" rx="62" ry="9" fill="#0002"/>${g?`<path d="M62 92h96l-10 64a12 12 0 0 1-12 10H84a12 12 0 0 1-12-10z" fill="${p.col}"/><path d="M58 84h104v10H58z" fill="color-mix(in srgb,${p.col} 70%,#fff)"/><path d="M76 98h14l-4 58h-8z" fill="#fff" opacity=".25"/>`:`<rect x="66" y="48" width="88" height="118" rx="10" fill="${p.col}"/><rect x="62" y="36" width="96" height="20" rx="6" fill="color-mix(in srgb,${p.col} 65%,#000)"/><rect x="74" y="84" width="72" height="44" rx="4" fill="#fbf6ea"/><text x="110" y="104" text-anchor="middle" font-size="11" font-family="Georgia,serif" fill="#2a2a2a">ЛИСТОК</text><text x="110" y="120" text-anchor="middle" font-size="10" font-family="system-ui" fill="#555">${p.c.toUpperCase()}</text><rect x="74" y="52" width="10" height="110" fill="#fff" opacity=".18"/>`}</svg>`};
+const fbox=document.getElementById("filters"),grid=document.getElementById("grid");
+const renderFilters=()=>{fbox.innerHTML=CATS.map(c=>`<button class="chip" aria-pressed="${c===cat}" data-c="${c}">${c}</button>`).join("")};
+const list=()=>{let r=PR.filter(p=>(cat==="Все"||p.c===cat)&&(p.n+p.c+p.d).toLowerCase().includes(q.toLowerCase()));if(sort==="asc")r.sort((a,b)=>a.p-b.p);else if(sort==="desc")r.sort((a,b)=>b.p-a.p);else r.sort((a,b)=>b.pop-a.pop);return r};
+const renderGrid=()=>{const r=list();grid.innerHTML=r.length?r.map(p=>`<article class="p">${tin(p)}<div class="b"><h3>${p.n}</h3><div class="m">${p.d}<br>${p.w}</div><div class="r"><span class="price">${rub(p.p)}</span><button class="primary" data-add="${p.id}">${cart[p.id]?`В корзине: ${cart[p.id]}`:"В корзину"}</button></div></div></article>`).join(""):`<div class="empty">Ничего не нашлось. Попробуйте другой запрос или категорию.</div>`};
+const totals=()=>{const items=Object.entries(cart).map(([id,n])=>({p:PR.find(x=>x.id==id),n}));const sub=items.reduce((s,i)=>s+i.p.p*i.n,0);const del=sub===0||sub>=FREE?0:DEL;return {items,sub,del,all:sub+del,count:items.reduce((s,i)=>s+i.n,0)}};
+const itemsEl=document.getElementById("items"),sumEl=document.getElementById("sum");
+let step="cart";
+const renderCart=()=>{const t=totals();document.getElementById("cnt").textContent=t.count;
+ if(step==="done")return;
+ if(!t.items.length){itemsEl.innerHTML=`<p style="color:var(--mute)">Корзина пуста. Добавьте чай из каталога.</p>`;sumEl.innerHTML="";return}
+ itemsEl.innerHTML=t.items.map(({p,n})=>`<div class="it"><div><b>${p.n}</b><br><span style="color:var(--mute);font-size:14px">${p.w} · ${rub(p.p)}</span></div><div style="text-align:right"><div class="qty"><button data-dec="${p.id}" aria-label="Меньше">−</button><b>${n}</b><button data-inc="${p.id}" aria-label="Больше">+</button></div><div class="price" style="font-size:16px;margin-top:4px">${rub(p.p*n)}</div></div></div>`).join("");
+ const left=FREE-t.sub;
+ sumEl.innerHTML=step==="cart"?`<div class="line"><span>Товары</span><b>${rub(t.sub)}</b></div><div class="line"><span>Доставка</span><b>${t.del?rub(t.del):"бесплатно"}</b></div>${left>0?`<div style="font-size:14px;color:var(--mute)">До бесплатной доставки ${rub(left)}</div>`:""}<div class="line" style="font-size:20px"><span>Итого</span><b>${rub(t.all)}</b></div><button class="primary" id="checkout">Оформить заказ</button>`
+ :`<form class="form" id="form" novalidate><b>Доставка</b><input id="f-name" placeholder="Имя" autocomplete="name"><input id="f-phone" placeholder="Телефон" inputmode="tel" autocomplete="tel"><input id="f-addr" placeholder="Адрес доставки" autocomplete="street-address"><textarea id="f-com" rows="2" placeholder="Комментарий"></textarea><div class="err" id="err"></div><div class="line" style="font-size:18px"><span>К оплате</span><b>${rub(t.all)}</b></div><button class="primary" type="submit">Подтвердить заказ</button><button type="button" class="chip" id="backToCart">Назад к корзине</button></form>`;
+};
+const rerender=()=>{renderGrid();renderCart();save()};
+const drawer=document.getElementById("drawer"),shade=document.getElementById("shade");
+const open=v=>{drawer.classList.toggle("open",v);shade.classList.toggle("open",v);if(v&&step==="done"){step="cart";renderCart()}};
+document.getElementById("openCart").onclick=()=>open(true);document.getElementById("closeCart").onclick=()=>open(false);shade.onclick=()=>open(false);
+document.addEventListener("keydown",e=>{if(e.key==="Escape")open(false)});
+fbox.onclick=e=>{const b=e.target.closest("[data-c]");if(b){cat=b.dataset.c;renderFilters();renderGrid()}};
+document.getElementById("q").oninput=e=>{q=e.target.value;renderGrid()};
+document.getElementById("sort").onchange=e=>{sort=e.target.value;renderGrid()};
+grid.onclick=e=>{const b=e.target.closest("[data-add]");if(b){const id=b.dataset.add;cart[id]=(cart[id]||0)+1;rerender()}};
+drawer.addEventListener("click",e=>{const i=e.target.closest("[data-inc]"),d=e.target.closest("[data-dec]");
+ if(i){cart[i.dataset.inc]++;rerender()}
+ if(d){const id=d.dataset.dec;cart[id]--;if(cart[id]<=0)delete cart[id];rerender()}
+ if(e.target.id==="checkout"){step="form";renderCart()}
+ if(e.target.id==="backToCart"){step="cart";renderCart()}});
+drawer.addEventListener("submit",e=>{e.preventDefault();const v=id=>document.getElementById(id).value.trim();const err=document.getElementById("err");
+ if(v("f-name").length<2)return err.textContent="Укажите имя";
+ if(v("f-phone").replace(/\D/g,"").length<10)return err.textContent="Проверьте телефон: нужно 10-11 цифр";
+ if(v("f-addr").length<5)return err.textContent="Укажите адрес доставки";
+ const t=totals(),num=Math.floor(10000+Math.random()*89999);step="done";
+ itemsEl.innerHTML=`<div class="ok"><h2 style="font-family:Georgia,serif;margin:0 0 8px">Заказ №${num} принят</h2><p>${v("f-name")}, мы позвоним по номеру ${v("f-phone")} для подтверждения.</p><p>Сумма: <b>${rub(t.all)}</b>, ${t.count} шт.</p><p style="color:var(--mute);font-size:14px">Это демо: заказ никуда не отправлен.</p></div>`;sumEl.innerHTML="";
+ cart={};save();renderGrid();document.getElementById("cnt").textContent=0});
+if(!Object.keys(cart).length){cart={3:1,8:1}}
+renderFilters();rerender();
+}
+</script>
+</body>
+</html>

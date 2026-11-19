@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BLADE - Барбершоп у метро Таганская (демо)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Georgia, serif;background:#111111;color:#f5f5f5;line-height:1.5}
+.wrap{max-width:1120px;margin:0 auto;padding:0 32px}
+header{display:flex;justify-content:space-between;align-items:center;padding:26px 0}
+.logo{font-weight:800;font-size:26px;letter-spacing:1px} .logo span{color:#d4a24c}
+nav a{color:#a3a3a3;text-decoration:none;margin-left:28px;font-size:15px}
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center;padding:56px 0 80px}
+.tag{display:inline-block;padding:6px 14px;border:1px solid #d4a24c;color:#d4a24c;border-radius:40px;font-size:13px;margin-bottom:22px}
+h1{font-size:54px;line-height:1.08;margin-bottom:22px}
+.lead{font-size:19px;color:#a3a3a3;max-width:520px;margin-bottom:34px}
+.btn{display:inline-block;background:#d4a24c;color:#111111;padding:16px 30px;border-radius:12px;font-weight:700;text-decoration:none;font-size:17px}
+.btn2{margin-left:14px;color:#f5f5f5;text-decoration:none;border-bottom:1px solid #a3a3a3;font-size:16px}
+.visual{height:400px;border-radius:28px;background:radial-gradient(circle at 30% 25%,#d4a24ccc,transparent 55%),radial-gradient(circle at 75% 80%,#d4a24c66,transparent 50%),#1c1c1c;position:relative;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.25)}
+.card{position:absolute;left:28px;bottom:28px;right:28px;background:#111111ee;border-radius:18px;padding:20px 22px;backdrop-filter:blur(6px)}
+.card b{display:block;font-size:18px;margin-bottom:4px} .card small{color:#a3a3a3}
+.stars{color:#d4a24c;letter-spacing:2px}
+section{padding:70px 0} section.alt{background:#1c1c1c}
+h2{font-size:36px;margin-bottom:34px}
+.feats{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.feat{background:#111111;border-radius:20px;padding:28px;border:1px solid #d4a24c33}
+.feat i{display:block;width:44px;height:44px;border-radius:12px;background:#d4a24c;margin-bottom:18px;opacity:.9}
+.feat b{font-size:19px;display:block;margin-bottom:8px} .feat p{color:#a3a3a3}
+.prices{display:grid;grid-template-columns:1fr 1fr;gap:16px 48px}
+.row{display:flex;justify-content:space-between;border-bottom:1px dashed #a3a3a366;padding:14px 0;font-size:18px}
+.row span:last-child{color:#d4a24c;font-weight:700}
+.cta{text-align:center;padding:80px 0} .cta p{color:#a3a3a3;margin:10px 0 30px}
+form{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+input{padding:16px 18px;border-radius:12px;border:1px solid #a3a3a366;background:#111111;color:#f5f5f5;font-size:16px;width:260px}
+footer{padding:30px 0;color:#a3a3a3;font-size:14px;text-align:center;border-top:1px solid #a3a3a333}
+@media(max-width:820px){.hero,.feats,.prices{grid-template-columns:1fr} h1{font-size:38px} nav{display:none} .visual{height:280px}}
+</style></head><body><a href="../../index.html" style="display:block;background:#13242e;color:#fff;text-align:center;font:14px/1.4 system-ui,sans-serif;padding:6px;text-decoration:none;position:relative;z-index:99">← Демо-лендинг из портфолио, компания вымышленная. Вернуться к портфолио</a>
+<div class="wrap">
+<header><div class="logo">BLAD<span>E</span></div><nav><a href="#feat">О нас</a><a href="#price">Услуги и цены</a><a href="#contact">Контакты</a></nav></header>
+<div class="hero"><div><div class="tag">Барбершоп у метро Таганская</div><h1>Мужские стрижки<br>без ожидания</h1><p class="lead">Классика, фейды и бритьё опасной бритвой. Запись онлайн за 30 секунд.</p>
+<a class="btn" href="#contact">Записаться</a><a class="btn2" href="#price">Услуги и цены</a></div>
+<div class="visual"><div class="card"><span class="stars">★★★★★</span><b>Мастера с опытом от 5 лет</b><small>Каждый проходит аттестацию и обучение раз в полгода.</small></div></div></div>
+</div>
+<section class="alt" id="feat"><div class="wrap"><h2>Почему выбирают нас</h2><div class="feats"><div class="feat"><i></i><b>Мастера с опытом от 5 лет</b><p>Каждый проходит аттестацию и обучение раз в полгода.</p></div><div class="feat"><i></i><b>Онлайн-запись 24/7</b><p>Выберите мастера и время в Telegram или на сайте.</p></div><div class="feat"><i></i><b>Кофе и PlayStation</b><p>Пока ждёте, можно отдохнуть в лаунж-зоне.</p></div></div></div></section>
+<section id="price"><div class="wrap"><h2>Услуги и цены</h2><div class="prices"><div class="row"><span>Мужская стрижка</span><span>1 800 ₽</span></div><div class="row"><span>Стрижка + борода</span><span>2 600 ₽</span></div><div class="row"><span>Королевское бритьё</span><span>1 500 ₽</span></div><div class="row"><span>Детская стрижка</span><span>1 200 ₽</span></div></div></div></section>
+<section class="alt cta" id="contact"><div class="wrap"><h2>Записаться</h2><p>Оставьте телефон - перезвоним в течение 15 минут</p>
+<form onsubmit="event.preventDefault();this.innerHTML='<b>Спасибо! Это демо-версия сайта.</b>'"><input placeholder="Ваше имя"><input placeholder="+7 (___) ___-__-__"><button class="btn" style="border:0;cursor:pointer">Отправить</button></form></div></section>
+<footer>Демо-сайт (концепт) для портфолио. Компания и данные вымышлены.</footer>
+</body></html>

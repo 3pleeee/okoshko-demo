@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Окошко онлайн-запись</title>
+<style>
+/* VOICE everyday tool: friendly, quick, mobile-first
+   IDEA a booking window: the client steps through service, master, day, time like a ticket counter
+   PICTURE the live booking ticket on the right fills in as you choose
+   COLOUR white/deep ink, brand blue #2f6bff, warm accent #ffb020, success green
+   TYPE system sans, heavy titles
+   LAYOUT laptop: steps column + sticky ticket; phone: steps then ticket bar */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0f1420);--soft:light-dark(#f2f5fb,#182033);--ink:light-dark(#121a2b,#eef2fb);--mute:light-dark(#5b6782,#9fabc6);--blue:#2f6bff;--acc:#ffb020;--ok:#1f9d55;--line:light-dark(#e2e7f2,#26304a)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip}
+.back{display:block;background:var(--blue);color:#fff;text-align:center;font-size:14px;padding:6px;text-decoration:none}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:16px max(4vw,16px);border-bottom:1px solid var(--line)}
+.brand{font-weight:900;font-size:22px;margin-right:auto}.brand span{color:var(--blue)}
+.tabs{display:flex;gap:6px}
+button{font:inherit;cursor:pointer;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);min-height:44px;padding:0 14px}
+button:focus-visible,input:focus{outline:3px solid var(--acc);outline-offset:1px}
+button[aria-pressed=true]{background:var(--blue);border-color:var(--blue);color:#fff}
+button:disabled{opacity:.4;cursor:not-allowed}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:28px;max-width:1180px;margin:0 auto;padding:24px max(4vw,16px) 40px}
+h1{font-size:clamp(28px,4vw,40px);line-height:1.05;margin:0 0 4px;letter-spacing:-.02em}
+.sub{color:var(--mute);margin:0 0 20px}
+h2{font-size:18px;margin:22px 0 10px}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.opt{text-align:left;padding:12px 14px;display:flex;flex-direction:column;gap:2px;min-height:64px}
+.opt small{color:inherit;opacity:.75}
+.days{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+.day{flex:none;width:66px;min-height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0}
+.day b{font-size:20px}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:8px}
+input{font:inherit;font-size:16px;padding:11px 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);width:100%}
+.form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.check{display:flex;gap:8px;align-items:flex-start;font-size:14px;color:var(--mute);grid-column:1/-1}
+.check input{width:20px;height:20px;flex:none;margin-top:2px}
+.go{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:800;width:100%;margin-top:12px;min-height:50px;font-size:17px}
+.ticket{position:sticky;top:16px;align-self:start;background:var(--soft);border-radius:20px;padding:22px;border:1px solid var(--line)}
+.ticket h3{margin:0 0 12px;font-size:20px}
+.tl{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.tl span{color:var(--mute)}.tl b{text-align:right}
+.total{font-size:24px;font-weight:900;margin-top:12px;display:flex;justify-content:space-between}
+.done{background:color-mix(in srgb,var(--ok) 12%,var(--bg));border:1.5px solid var(--ok);border-radius:16px;padding:18px;margin-top:16px}
+.err{color:#d93636;font-size:14px;min-height:1.2em;grid-column:1/-1}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--mute);font-weight:600;font-size:14px}
+.scroll{overflow-x:auto}
+.note{font-size:13px;color:var(--mute)}
+@media(max-width:860px){.main{grid-template-columns:minmax(0,1fr)}.ticket{position:static}}
+@media(max-width:600px){.form{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<a class="back" href="../index.html">← Локальная демо-копия сервиса «Окошко». Вернуться к портфолио</a>
+<header><div class="brand">Окошко<span>.</span> Барбершоп Blade</div><div class="tabs"><button id="t-client" aria-pressed="true">Запись</button><button id="t-admin" aria-pressed="false">Кабинет мастера</button></div></header>
+
+<div class="main" id="client">
+  <section>
+    <h1>Запишитесь за минуту</h1>
+    <p class="sub">Выберите услугу, мастера и свободное время. Занятые слоты скрыты.</p>
+    <h2>Услуга</h2><div class="opts" id="svc"></div>
+    <h2>Мастер</h2><div class="opts" id="mst"></div>
+    <h2>День</h2><div class="days" id="days"></div>
+    <h2>Время</h2><div class="slots" id="slots"></div>
+    <h2>Контакты</h2>
+    <form class="form" id="form" novalidate>
+      <input id="name" placeholder="Имя" autocomplete="name">
+      <input id="phone" placeholder="Телефон" inputmode="tel" autocomplete="tel">
+      <label class="check"><input type="checkbox" id="agree"> Согласен на обработку персональных данных для записи</label>
+      <div class="err" id="err"></div>
+    </form>
+    <div id="done"></div>
+  </section>
+  <aside class="ticket" aria-live="polite"><h3>Ваша запись</h3><div id="tk"></div><button class="go" id="go">Записаться</button><p class="note">Демо: запись хранится только в этом браузере.</p></aside>
+</div>
+
+<div class="main" id="admin" hidden style="grid-template-columns:minmax(0,1fr)">
+  <section><h1>Записи</h1><p class="sub">Так мастер видит записи в «Окошке». Отмена освобождает слот.</p><div class="scroll"><table><thead><tr><th>Дата</th><th>Время</th><th>Клиент</th><th>Услуга</th><th>Мастер</th><th></th></tr></thead><tbody id="rows"></tbody></table></div></section>
+</div>
+
+<script>
+{
+const SVC=[{id:"cut",n:"Мужская стрижка",m:60,p:1800},{id:"beard",n:"Стрижка бороды",m:30,p:900},{id:"combo",n:"Стрижка + борода",m:90,p:2600},{id:"kid",n:"Детская стрижка",m:45,p:1200}];
+const MST=[{id:"a",n:"Артём",r:"топ-барбер"},{id:"i",n:"Игорь",r:"барбер"},{id:"any",n:"Любой мастер",r:"ближайшее время"}];
+const HOURS=["10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00"];
+const rub=n=>n.toLocaleString("ru-RU")+" ₽";
+const iso=d=>d.toISOString().slice(0,10);
+const today=new Date();today.setHours(12,0,0,0);
+const DAYS=[...Array(14)].map((_,i)=>{const d=new Date(today);d.setDate(d.getDate()+i);return d});
+const WD=["Вс","Пн","Вт","Ср","Чт","Пт","Сб"];
+let B=[];try{B=JSON.parse(localStorage.getItem("okoshko-demo")||"null")}catch(e){B=null}
+if(!Array.isArray(B)){B=[{d:iso(DAYS[0]),h:"14:00",m:"a",s:"cut",n:"Максим",ph:"+7 900 555-01-01"},{d:iso(DAYS[1]),h:"12:00",m:"a",s:"combo",n:"Денис",ph:"+7 900 555-02-02"},{d:iso(DAYS[1]),h:"16:00",m:"i",s:"beard",n:"Олег",ph:"+7 900 555-03-03"}]}
+const save=()=>{try{localStorage.setItem("okoshko-demo",JSON.stringify(B))}catch(e){}};
+let st={s:"cut",m:"a",d:iso(DAYS[1]),h:null};
+const $=id=>document.getElementById(id);
+const busy=(d,h,m)=>B.some(b=>b.d===d&&b.h===h&&(m==="any"?false:b.m===m));
+const freeFor=(d,h,m)=>{if(m!=="any")return !busy(d,h,m);return MST.filter(x=>x.id!=="any").some(x=>!busy(d,h,x.id))};
+const past=(d,h)=>{const now=new Date();const t=new Date(d+"T"+h);return t<now};
+const render=()=>{
+ $("svc").innerHTML=SVC.map(s=>`<button class="opt" aria-pressed="${st.s===s.id}" data-s="${s.id}"><b>${s.n}</b><small>${s.m} мин · ${rub(s.p)}</small></button>`).join("");
+ $("mst").innerHTML=MST.map(m=>`<button class="opt" aria-pressed="${st.m===m.id}" data-m="${m.id}"><b>${m.n}</b><small>${m.r}</small></button>`).join("");
+ $("days").innerHTML=DAYS.map(d=>{const k=iso(d),off=d.getDay()===1;return `<button class="day" ${off?"disabled":""} aria-pressed="${st.d===k}" data-d="${k}"><small>${WD[d.getDay()]}</small><b>${d.getDate()}</b></button>`}).join("");
+ const fr=HOURS.filter(h=>freeFor(st.d,h,st.m)&&!past(st.d,h));
+ if(st.h&&!fr.includes(st.h))st.h=null;
+ $("slots").innerHTML=fr.length?fr.map(h=>`<button aria-pressed="${st.h===h}" data-h="${h}">${h}</button>`).join(""):`<p class="note">На этот день всё занято, выберите другой.</p>`;
+ const s=SVC.find(x=>x.id===st.s),m=MST.find(x=>x.id===st.m),d=new Date(st.d+"T12:00");
+ $("tk").innerHTML=`<div class="tl"><span>Услуга</span><b>${s.n}</b></div><div class="tl"><span>Мастер</span><b>${m.n}</b></div><div class="tl"><span>Дата</span><b>${d.toLocaleDateString("ru-RU",{day:"numeric",month:"long",weekday:"short"})}</b></div><div class="tl"><span>Время</span><b>${st.h||"не выбрано"}</b></div><div class="total"><span>Итого</span><span>${rub(s.p)}</span></div>`;
+ $("rows").innerHTML=[...B].sort((a,b)=>(a.d+a.h).localeCompare(b.d+b.h)).map((b,i)=>`<tr><td>${new Date(b.d+"T12:00").toLocaleDateString("ru-RU",{day:"numeric",month:"short"})}</td><td>${b.h}</td><td>${b.n}<br><small class="note">${b.ph}</small></td><td>${SVC.find(x=>x.id===b.s).n}</td><td>${MST.find(x=>x.id===b.m).n}</td><td><button data-cancel="${b.d}|${b.h}|${b.m}">Отменить</button></td></tr>`).join("")||`<tr><td colspan="6" class="note">Записей пока нет</td></tr>`;
+};
+document.body.addEventListener("click",e=>{const t=e.target.closest("button");if(!t)return;
+ if(t.dataset.s){st.s=t.dataset.s}else if(t.dataset.m){st.m=t.dataset.m}else if(t.dataset.d){st.d=t.dataset.d}else if(t.dataset.h){st.h=t.dataset.h}
+ else if(t.dataset.cancel){const [d,h,m]=t.dataset.cancel.split("|");B=B.filter(b=>!(b.d===d&&b.h===h&&b.m===m));save()}else return;render()});
+$("go").onclick=()=>{const err=$("err");const n=$("name").value.trim(),ph=$("phone").value.trim();
+ if(!st.h)return err.textContent="Выберите время";
+ if(n.length<2)return err.textContent="Укажите имя";
+ if(ph.replace(/\D/g,"").length<10)return err.textContent="Проверьте телефон";
+ if(!$("agree").checked)return err.textContent="Нужно согласие на обработку данных";
+ let m=st.m;if(m==="any")m=MST.find(x=>x.id!=="any"&&!busy(st.d,st.h,x.id)).id;
+ B.push({d:st.d,h:st.h,m,s:st.s,n,ph});save();err.textContent="";
+ $("done").innerHTML=`<div class="done"><b>Готово, ${n}!</b> Вы записаны ${new Date(st.d+"T12:00").toLocaleDateString("ru-RU",{day:"numeric",month:"long"})} в ${st.h} к мастеру ${MST.find(x=>x.id===m).n}. В настоящем «Окошке» сюда придёт подтверждение в Telegram и напоминание накануне.</div>`;
+ st.h=null;render()};
+const tab=a=>{$("client").hidden=a;$("admin").hidden=!a;$("t-client").setAttribute("aria-pressed",!a);$("t-admin").setAttribute("aria-pressed",a)};
+$("t-client").onclick=()=>tab(false);$("t-admin").onclick=()=>tab(true);
+render();
+}
+</script>
+</body>
+</html>

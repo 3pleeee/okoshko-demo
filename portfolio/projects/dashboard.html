@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Дашборд продаж</title>
+<style>
+:root{color-scheme:light dark;--bg:light-dark(#f7f8fa,#0e1116);--card:light-dark(#fff,#171b22);--ink:light-dark(#151a22,#e9edf3);--mute:light-dark(#667085,#98a2b3);--grid:light-dark(#e8ebf0,#262c36);--s1:#2a78d6;--s2:#e08a1e;--up:#1a8f52;--down:#d0433a}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip}
+.back{display:block;background:var(--s1);color:#fff;text-align:center;font-size:14px;padding:6px;text-decoration:none}
+.wrap{max-width:1150px;margin:0 auto;padding:20px max(3vw,16px) 40px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:16px}
+h1{margin:0 auto 0 0;font-size:clamp(24px,3.4vw,34px);letter-spacing:-.02em}
+.seg{display:flex;border:1.5px solid var(--grid);border-radius:10px;overflow:hidden}
+.seg button{font:inherit;border:0;background:var(--card);color:var(--ink);min-height:40px;padding:0 14px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+:focus-visible{outline:3px solid var(--s2);outline-offset:2px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:12px}
+.k{background:var(--card);border:1px solid var(--grid);border-radius:14px;padding:14px 16px}
+.k small{color:var(--mute)}.k b{display:block;font-size:26px;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.d{font-size:13px;font-weight:700}.d.up{color:var(--up)}.d.down{color:var(--down)}
+.grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px}
+.panel{background:var(--card);border:1px solid var(--grid);border-radius:14px;padding:16px}
+.panel h2{font-size:15px;margin:0 0 8px}
+.legend{display:flex;gap:14px;font-size:13px;color:var(--mute);margin-bottom:4px}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+svg{display:block;width:100%;height:auto}
+svg text{fill:var(--mute);font-size:11px}
+.bar{display:grid;grid-template-columns:110px minmax(0,1fr) 70px;gap:8px;align-items:center;margin:9px 0;font-size:14px}
+.bar div{height:10px;border-radius:4px;background:var(--s1)}
+.bar span:last-child{text-align:right;font-variant-numeric:tabular-nums}
+#tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);padding:6px 9px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .1s}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:8px 6px;border-bottom:1px solid var(--grid);text-align:left}td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}th{color:var(--mute);font-weight:600}
+.note{color:var(--mute);font-size:13px}
+@media(max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<a class="back" href="../index.html">← Демо-проект из портфолио. Вернуться к портфолио</a>
+<div class="wrap">
+<header><h1>Продажи интернет-магазина</h1><div class="seg" id="seg"><button data-p="7">7 дней</button><button data-p="30" aria-pressed="true">30 дней</button><button data-p="90">90 дней</button></div></header>
+<div class="kpis" id="kpis"></div>
+<div class="grid">
+ <section class="panel"><h2>Выручка по дням</h2><div class="legend"><span><i style="background:var(--s1)"></i>этот период</span><span><i style="background:var(--s2)"></i>прошлый период</span></div><svg id="ch" viewBox="0 0 640 260" role="img" aria-label="График выручки"></svg></section>
+ <section class="panel"><h2>Категории</h2><div id="cats"></div></section>
+</div>
+<section class="panel" style="margin-top:12px"><h2>Последние заказы</h2><div style="overflow-x:auto"><table><thead><tr><th>№</th><th>Дата</th><th>Товар</th><th class="n">Сумма</th></tr></thead><tbody id="ord"></tbody></table></div></section>
+<p class="note">Данные сгенерированы для демонстрации. В реальном проекте дашборд берёт их из базы или Google Таблицы.</p>
+</div>
+<div id="tip"></div>
+<script>
+{
+let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+const N=180,base=new Date();base.setHours(0,0,0,0);
+const DAYS=[...Array(N)].map((_,i)=>{const d=new Date(base);d.setDate(d.getDate()-(N-1-i));const wk=[.8,1,1,1.05,1.15,1.3,1.1][d.getDay()];const v=Math.round((38000+i*120)*wk*(.75+rnd()*.5));return{d,v,o:Math.round(v/(1900+rnd()*600))}});
+const CATS=[["Чай",.41],["Посуда",.24],["Наборы",.19],["Сладости",.1],["Аксессуары",.06]];
+const ITEMS=["Улун Те Гуань Инь","Чайник 600 мл","Набор «Утро»","Пуэр шу 100 г","Сенча","Гайвань","Мёд с цветочным","Ситечко"];
+const rub=n=>Math.round(n).toLocaleString("ru-RU")+" ₽";
+const short=n=>n>=1e6?(n/1e6).toFixed(1).replace(".",",")+" млн":Math.round(n/1e3)+" тыс";
+const $=id=>document.getElementById(id);
+const tip=$("tip");
+const draw=p=>{
+ const cur=DAYS.slice(-p),prev=DAYS.slice(-2*p,-p);
+ const sum=a=>a.reduce((s,x)=>s+x.v,0),ord=a=>a.reduce((s,x)=>s+x.o,0);
+ const R=sum(cur),Rp=sum(prev),O=ord(cur),Op=ord(prev);
+ const pct=(a,b)=>{const v=(a-b)/b*100;return `<span class="d ${v>=0?"up":"down"}">${v>=0?"▲":"▼"} ${Math.abs(v).toFixed(1).replace(".",",")}%</span>`};
+ $("kpis").innerHTML=`<div class="k"><small>Выручка</small><b>${rub(R)}</b>${pct(R,Rp)}</div><div class="k"><small>Заказы</small><b>${O}</b>${pct(O,Op)}</div><div class="k"><small>Средний чек</small><b>${rub(R/O)}</b>${pct(R/O,Rp/Op)}</div><div class="k"><small>Конверсия</small><b>${(2.1+p/200).toFixed(1).replace(".",",")}%</b><span class="d up">▲ 0,3 п.п.</span></div>`;
+ const W=640,H=260,l=48,r=10,t=10,bt=28,max=Math.max(...cur.map(x=>x.v),...prev.map(x=>x.v))*1.08;
+ const X=i=>l+(W-l-r)*(p===1?0:i/(p-1)),Y=v=>t+(H-t-bt)*(1-v/max);
+ const path=a=>a.map((x,i)=>(i?"L":"M")+X(i).toFixed(1)+" "+Y(x.v).toFixed(1)).join("");
+ let g="";for(let k=0;k<=4;k++){const v=max/4*k;g+=`<line x1="${l}" x2="${W-r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)"/><text x="${l-6}" y="${Y(v)+4}" text-anchor="end">${short(v)}</text>`}
+ const step=Math.ceil(p/6);cur.forEach((x,i)=>{if(i%step===0||i===p-1)g+=`<text x="${X(i)}" y="${H-8}" text-anchor="middle">${x.d.getDate()}.${String(x.d.getMonth()+1).padStart(2,"0")}</text>`});
+ $("ch").innerHTML=g+`<path d="${path(prev)}" fill="none" stroke="var(--s2)" stroke-width="1.6" stroke-dasharray="4 3"/><path d="${path(cur)}" fill="none" stroke="var(--s1)" stroke-width="2.4" stroke-linejoin="round"/><line id="vl" y1="${t}" y2="${H-bt}" stroke="var(--mute)" opacity="0"/><circle id="dot" r="4.5" fill="var(--s1)" stroke="var(--card)" stroke-width="2" opacity="0"/><rect x="${l}" y="${t}" width="${W-l-r}" height="${H-t-bt}" fill="transparent" id="hit"/>`;
+ const svg=$("ch");
+ $("hit").onpointermove=e=>{const b=svg.getBoundingClientRect();const sx=(e.clientX-b.left)/b.width*W;const i=Math.max(0,Math.min(p-1,Math.round((sx-l)/(W-l-r)*(p-1))));const x=cur[i];
+  $("vl").setAttribute("x1",X(i));$("vl").setAttribute("x2",X(i));$("vl").setAttribute("opacity",.5);$("dot").setAttribute("cx",X(i));$("dot").setAttribute("cy",Y(x.v));$("dot").setAttribute("opacity",1);
+  tip.innerHTML=`${x.d.toLocaleDateString("ru-RU",{day:"numeric",month:"short"})}: <b>${rub(x.v)}</b>${prev[i]?`<br>было ${rub(prev[i].v)}`:""}`;tip.style.left=Math.min(innerWidth-170,e.clientX+12)+"px";tip.style.top=(e.clientY-50)+"px";tip.style.opacity=1};
+ $("hit").onpointerleave=()=>{tip.style.opacity=0;$("vl").setAttribute("opacity",0);$("dot").setAttribute("opacity",0)};
+ $("cats").innerHTML=CATS.map(([n,s])=>`<div class="bar"><span>${n}</span><div style="width:${s/CATS[0][1]*100}%"></div><span>${short(R*s)}</span></div>`).join("");
+ seed=11;$("ord").innerHTML=[...Array(6)].map((_,i)=>{const d=cur[cur.length-1-Math.floor(i/2)].d;return `<tr><td>${5480-i}</td><td>${d.toLocaleDateString("ru-RU",{day:"numeric",month:"short"})}</td><td>${ITEMS[Math.floor(rnd()*ITEMS.length)]}</td><td class="n">${rub(900+rnd()*4200)}</td></tr>`}).join("");
+};
+$("seg").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;document.querySelectorAll("#seg button").forEach(x=>x.setAttribute("aria-pressed",x===b));draw(+b.dataset.p)});
+draw(30);
+}
+</script>
+</body>
+</html>

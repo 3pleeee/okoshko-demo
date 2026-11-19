@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>РемонтПро - Ремонт квартир в Москве и области (демо)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI', Arial, sans-serif;background:#ffffff;color:#1f2937;line-height:1.5}
+.wrap{max-width:1120px;margin:0 auto;padding:0 32px}
+header{display:flex;justify-content:space-between;align-items:center;padding:26px 0}
+.logo{font-weight:800;font-size:26px;letter-spacing:1px} .logo span{color:#f97316}
+nav a{color:#6b7280;text-decoration:none;margin-left:28px;font-size:15px}
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center;padding:56px 0 80px}
+.tag{display:inline-block;padding:6px 14px;border:1px solid #f97316;color:#f97316;border-radius:40px;font-size:13px;margin-bottom:22px}
+h1{font-size:54px;line-height:1.08;margin-bottom:22px}
+.lead{font-size:19px;color:#6b7280;max-width:520px;margin-bottom:34px}
+.btn{display:inline-block;background:#f97316;color:#ffffff;padding:16px 30px;border-radius:12px;font-weight:700;text-decoration:none;font-size:17px}
+.btn2{margin-left:14px;color:#1f2937;text-decoration:none;border-bottom:1px solid #6b7280;font-size:16px}
+.visual{height:400px;border-radius:28px;background:radial-gradient(circle at 30% 25%,#f97316cc,transparent 55%),radial-gradient(circle at 75% 80%,#f9731666,transparent 50%),#f3f5f8;position:relative;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.25)}
+.card{position:absolute;left:28px;bottom:28px;right:28px;background:#ffffffee;border-radius:18px;padding:20px 22px;backdrop-filter:blur(6px)}
+.card b{display:block;font-size:18px;margin-bottom:4px} .card small{color:#6b7280}
+.stars{color:#f97316;letter-spacing:2px}
+section{padding:70px 0} section.alt{background:#f3f5f8}
+h2{font-size:36px;margin-bottom:34px}
+.feats{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.feat{background:#ffffff;border-radius:20px;padding:28px;border:1px solid #f9731633}
+.feat i{display:block;width:44px;height:44px;border-radius:12px;background:#f97316;margin-bottom:18px;opacity:.9}
+.feat b{font-size:19px;display:block;margin-bottom:8px} .feat p{color:#6b7280}
+.prices{display:grid;grid-template-columns:1fr 1fr;gap:16px 48px}
+.row{display:flex;justify-content:space-between;border-bottom:1px dashed #6b728066;padding:14px 0;font-size:18px}
+.row span:last-child{color:#f97316;font-weight:700}
+.cta{text-align:center;padding:80px 0} .cta p{color:#6b7280;margin:10px 0 30px}
+form{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+input{padding:16px 18px;border-radius:12px;border:1px solid #6b728066;background:#ffffff;color:#1f2937;font-size:16px;width:260px}
+footer{padding:30px 0;color:#6b7280;font-size:14px;text-align:center;border-top:1px solid #6b728033}
+@media(max-width:820px){.hero,.feats,.prices{grid-template-columns:1fr} h1{font-size:38px} nav{display:none} .visual{height:280px}}
+</style></head><body><a href="../../index.html" style="display:block;background:#13242e;color:#fff;text-align:center;font:14px/1.4 system-ui,sans-serif;padding:6px;text-decoration:none;position:relative;z-index:99">← Демо-лендинг из портфолио, компания вымышленная. Вернуться к портфолио</a>
+<div class="wrap">
+<header><div class="logo">РемонтПр<span>о</span></div><nav><a href="#feat">О нас</a><a href="#price">Цены</a><a href="#contact">Контакты</a></nav></header>
+<div class="hero"><div><div class="tag">Ремонт квартир в Москве и области</div><h1>Ремонт квартир<br>с фиксированной сметой</h1><p class="lead">Смета не меняется после подписания договора. Гарантия 3 года на все работы.</p>
+<a class="btn" href="#contact">Рассчитать стоимость</a><a class="btn2" href="#price">Цены</a></div>
+<div class="visual"><div class="card"><span class="stars">★★★★★</span><b>Смета за 1 день</b><small>Замер бесплатно, расчёт на следующий день.</small></div></div></div>
+</div>
+<section class="alt" id="feat"><div class="wrap"><h2>Почему выбирают нас</h2><div class="feats"><div class="feat"><i></i><b>Смета за 1 день</b><p>Замер бесплатно, расчёт на следующий день.</p></div><div class="feat"><i></i><b>Этапы с фотоотчётом</b><p>Видите ход работ, не приезжая на объект.</p></div><div class="feat"><i></i><b>Гарантия 3 года</b><p>Прописана в договоре.</p></div></div></div></section>
+<section id="price"><div class="wrap"><h2>Цены</h2><div class="prices"><div class="row"><span>Косметический ремонт</span><span>от 4 500 ₽/м²</span></div><div class="row"><span>Капитальный ремонт</span><span>от 9 000 ₽/м²</span></div><div class="row"><span>Дизайнерский ремонт</span><span>от 14 000 ₽/м²</span></div><div class="row"><span>Ванная под ключ</span><span>от 180 000 ₽</span></div></div></div></section>
+<section class="alt cta" id="contact"><div class="wrap"><h2>Рассчитать стоимость</h2><p>Оставьте телефон - перезвоним в течение 15 минут</p>
+<form onsubmit="event.preventDefault();this.innerHTML='<b>Спасибо! Это демо-версия сайта.</b>'"><input placeholder="Ваше имя"><input placeholder="+7 (___) ___-__-__"><button class="btn" style="border:0;cursor:pointer">Отправить</button></form></div></section>
+<footer>Демо-сайт (концепт) для портфолио. Компания и данные вымышлены.</footer>
+</body></html>

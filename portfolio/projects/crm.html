@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Мини-CRM заявок</title>
+<style>
+:root{color-scheme:light dark;--bg:light-dark(#f4f1ea,#15140f);--card:light-dark(#fffdf8,#201e17);--ink:light-dark(#1d1a14,#f1ece0);--mute:light-dark(#6b6457,#a9a191);--line:light-dark(#e3ddcf,#34302500);--acc:#e0572b;--line2:light-dark(#e3ddcf,#353126)}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip}
+.back{display:block;background:var(--acc);color:#fff;text-align:center;font-size:14px;padding:6px;text-decoration:none}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:end;padding:20px max(3vw,16px) 8px}
+h1{margin:0;font-size:clamp(26px,3.5vw,36px);letter-spacing:-.02em;margin-right:auto}
+.stats{display:flex;gap:18px;color:var(--mute);font-size:14px}.stats b{display:block;color:var(--ink);font-size:20px}
+form{display:flex;flex-wrap:wrap;gap:8px;padding:10px max(3vw,16px)}
+input,select,button{font:inherit;font-size:16px;border-radius:10px;border:1.5px solid var(--line2);background:var(--card);color:var(--ink);min-height:44px;padding:0 12px}
+input{flex:1 1 180px}
+button{cursor:pointer;background:var(--acc);border-color:var(--acc);color:#fff;font-weight:700}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.board{display:grid;grid-template-columns:repeat(4,minmax(240px,1fr));gap:12px;padding:10px max(3vw,16px) 30px;overflow-x:auto}
+.col{background:color-mix(in srgb,var(--ink) 5%,transparent);border-radius:14px;padding:10px;min-height:260px;transition:background .15s}
+.col.over{background:color-mix(in srgb,var(--acc) 18%,transparent)}
+.col h2{font-size:14px;text-transform:uppercase;letter-spacing:.06em;margin:4px 4px 10px;display:flex;justify-content:space-between}
+.col h2 span{color:var(--mute)}
+.card{background:var(--card);border:1px solid var(--line2);border-radius:12px;padding:10px 12px;margin-bottom:8px;cursor:grab;box-shadow:0 1px 0 var(--line2)}
+.card.drag{opacity:.4}
+.card b{display:block}.card small{color:var(--mute)}
+.row{display:flex;justify-content:space-between;align-items:center;margin-top:6px;gap:6px}
+.sum{font-weight:800}
+.mv{display:flex;gap:4px}
+.mv button{min-height:32px;min-width:32px;padding:0 8px;font-size:14px;background:transparent;color:var(--ink);border-color:var(--line2)}
+.tag{font-size:12px;padding:2px 8px;border-radius:99px;background:color-mix(in srgb,var(--acc) 15%,transparent);color:var(--acc);font-weight:700}
+.note{color:var(--mute);font-size:13px;padding:0 max(3vw,16px) 20px}
+</style>
+</head>
+<body>
+<a class="back" href="../index.html">← Демо-проект из портфолио. Вернуться к портфолио</a>
+<header><h1>Заявки студии ремонта</h1><div class="stats" id="stats"></div></header>
+<form id="f"><input id="n" placeholder="Клиент" required><input id="w" placeholder="Что нужно" required><input id="s" placeholder="Сумма, ₽" inputmode="numeric" style="flex:0 1 130px"><select id="src"><option>Авито</option><option>Сайт</option><option>Telegram</option><option>Звонок</option></select><button>Добавить</button></form>
+<div class="board" id="b"></div>
+<p class="note">Перетаскивайте карточки между колонками (на телефоне - стрелками). Данные вымышленные и хранятся только в этом браузере.</p>
+<script>
+{
+const COLS=[["new","Новые"],["talk","В работе"],["offer","Смета"],["won","Оплачено"]];
+let L;try{L=JSON.parse(localStorage.getItem("crm-demo")||"null")}catch(e){}
+if(!Array.isArray(L))L=[{id:1,n:"Анна К.",w:"Ремонт ванной",s:180000,src:"Авито",c:"new"},{id:2,n:"ООО Вектор",w:"Офис 60 м²",s:420000,src:"Сайт",c:"offer"},{id:3,n:"Павел",w:"Замена проводки",s:35000,src:"Telegram",c:"talk"},{id:4,n:"Ирина",w:"Кухня под ключ",s:260000,src:"Звонок",c:"won"},{id:5,n:"Сергей",w:"Поклейка обоев",s:22000,src:"Авито",c:"new"}];
+const save=()=>{try{localStorage.setItem("crm-demo",JSON.stringify(L))}catch(e){}};
+const rub=n=>(+n||0).toLocaleString("ru-RU")+" ₽";
+const b=document.getElementById("b");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const render=()=>{
+ b.innerHTML=COLS.map(([k,t],ci)=>{const it=L.filter(x=>x.c===k);return `<section class="col" data-c="${k}"><h2>${t}<span>${it.length} · ${rub(it.reduce((a,x)=>a+(+x.s||0),0))}</span></h2>${it.map(x=>`<article class="card" draggable="true" data-id="${x.id}"><b>${esc(x.n)}</b><small>${esc(x.w)}</small><div class="row"><span class="tag">${esc(x.src)}</span><span class="sum">${rub(x.s)}</span></div><div class="row"><span></span><span class="mv">${ci>0?`<button data-mv="-1" data-id="${x.id}" aria-label="Назад">←</button>`:""}${ci<3?`<button data-mv="1" data-id="${x.id}" aria-label="Вперёд">→</button>`:""}<button data-del="${x.id}" aria-label="Удалить">✕</button></span></div></article>`).join("")}</section>`}).join("");
+ const won=L.filter(x=>x.c==="won"),all=L.length;
+ document.getElementById("stats").innerHTML=`<div><b>${all}</b>заявок</div><div><b>${all?Math.round(won.length/all*100):0}%</b>конверсия</div><div><b>${rub(won.reduce((a,x)=>a+(+x.s||0),0))}</b>оплачено</div>`;
+};
+b.addEventListener("dragstart",e=>{const c=e.target.closest(".card");if(!c)return;e.dataTransfer.setData("text/plain",c.dataset.id);c.classList.add("drag")});
+b.addEventListener("dragend",e=>{const c=e.target.closest(".card");c&&c.classList.remove("drag")});
+b.addEventListener("dragover",e=>{const col=e.target.closest(".col");if(!col)return;e.preventDefault();document.querySelectorAll(".col").forEach(x=>x.classList.toggle("over",x===col))});
+b.addEventListener("dragleave",e=>{if(!b.contains(e.relatedTarget))document.querySelectorAll(".col").forEach(x=>x.classList.remove("over"))});
+b.addEventListener("drop",e=>{const col=e.target.closest(".col");if(!col)return;e.preventDefault();const id=+e.dataTransfer.getData("text/plain");const x=L.find(y=>y.id===id);if(x){x.c=col.dataset.c;save()}render()});
+b.addEventListener("click",e=>{const t=e.target.closest("button");if(!t)return;
+ if(t.dataset.del){L=L.filter(x=>x.id!=+t.dataset.del)}
+ else{const x=L.find(y=>y.id==t.dataset.id);const i=COLS.findIndex(c=>c[0]===x.c)+ +t.dataset.mv;x.c=COLS[Math.max(0,Math.min(3,i))][0]}
+ save();render()});
+document.getElementById("f").addEventListener("submit",e=>{e.preventDefault();const g=id=>document.getElementById(id);
+ L.unshift({id:Date.now(),n:g("n").value.trim(),w:g("w").value.trim(),s:+g("s").value.replace(/\D/g,"")||0,src:g("src").value,c:"new"});save();e.target.reset();render()});
+render();
+}
+</script>
+</body>
+</html>

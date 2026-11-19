@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Telegram-бот записи: исходный код</title>
+<style>
+:root{color-scheme:light dark;--bg:light-dark(#eef3f7,#0d1117);--card:light-dark(#fff,#161b22);--ink:light-dark(#14202b,#e6edf3);--mute:light-dark(#5b6b7a,#8b98a5);--tg:#229ed9;--code:#0d1117;--line:light-dark(#dbe3ea,#262d36)}
+*{box-sizing:border-box;min-width:0}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip}
+.back{display:block;background:var(--tg);color:#fff;text-align:center;font-size:14px;padding:6px;text-decoration:none}
+.wrap{max-width:1150px;margin:0 auto;padding:20px max(3vw,16px) 40px;display:grid;grid-template-columns:340px minmax(0,1fr);gap:20px}
+h1{font-size:clamp(24px,3.4vw,34px);margin:0 0 6px;letter-spacing:-.02em}p{margin:0 0 12px}.mute{color:var(--mute)}
+.phone{background:light-dark(#cfe2ee,#1c2733);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:8px;min-height:420px}
+.m{max-width:85%;padding:8px 11px;border-radius:14px;background:var(--card);font-size:14px;white-space:pre-line}.m.me{align-self:flex-end;background:light-dark(#dcf3c8,#2b5278)}
+.kb{display:flex;flex-wrap:wrap;gap:6px}.kb button{flex:1 1 40%;font:inherit;font-size:14px;min-height:40px;border-radius:10px;border:0;background:light-dark(#ffffffcc,#2a3a4a);color:var(--ink);cursor:pointer}
+.kb button:focus-visible,.copy:focus-visible{outline:3px solid var(--tg)}
+.code{background:var(--code);color:#e6edf3;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+.bar{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#161b22;font-size:13px;color:#8b98a5}
+.copy{font:inherit;font-size:13px;background:var(--tg);color:#fff;border:0;border-radius:8px;min-height:34px;padding:0 12px;cursor:pointer}
+pre{margin:0;padding:14px;overflow:auto;max-height:70vh;font:13px/1.55 ui-monospace,"JetBrains Mono",Consolas,monospace}
+ul{padding-left:18px;margin:0 0 12px}
+@media(max-width:860px){.wrap{grid-template-columns:minmax(0,1fr)}}
+</style></head><body>
+<a class="back" href="../index.html">← Учебный проект из портфолио. Вернуться к портфолио</a>
+<div class="wrap">
+<section>
+<h1>Telegram-бот записи</h1>
+<p class="mute">Python, aiogram 3, SQLite. Около 100 строк. Слева - имитация диалога, справа - настоящий код, который запускается командой <code>python bot.py</code>.</p>
+<ul><li>выбор услуги, дня и часа кнопками</li><li>занятые слоты не показываются</li><li>владельцу приходит уведомление</li></ul>
+<div class="phone" id="chat" aria-live="polite"></div>
+</section>
+<section class="code"><div class="bar"><span>bot.py</span><button class="copy" id="cp">Скопировать</button></div><pre id="src">import asyncio, os, sqlite3
+from datetime import date, timedelta
+from aiogram import Bot, Dispatcher, F
+from aiogram.filters import CommandStart
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.types import CallbackQuery, Message
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+
+SERVICES = {
+    &quot;cut&quot;: &quot;Haircut - $25&quot;,
+    &quot;beard&quot;: &quot;Beard trim - $15&quot;,
+    &quot;combo&quot;: &quot;Cut + beard - $35&quot;,
+}
+HOURS = [&quot;10:00&quot;, &quot;12:00&quot;, &quot;14:00&quot;, &quot;16:00&quot;, &quot;18:00&quot;]
+OWNER_ID = int(os.getenv(&quot;OWNER_ID&quot;, &quot;0&quot;))
+
+db = sqlite3.connect(&quot;bookings.db&quot;)
+db.execute(&quot;CREATE TABLE IF NOT EXISTS bookings &quot;
+           &quot;(user_id INT, name TEXT, service TEXT, day TEXT, hour TEXT)&quot;)
+dp = Dispatcher()
+
+
+class Booking(StatesGroup):
+    service = State()
+    day = State()
+    hour = State()
+
+
+def keyboard(items, prefix):
+    kb = InlineKeyboardBuilder()
+    for key, label in items:
+        kb.button(text=label, callback_data=f&quot;{prefix}:{key}&quot;)
+    return kb.adjust(1).as_markup()
+
+
+def taken(day):
+    rows = db.execute(&quot;SELECT hour FROM bookings WHERE day = ?&quot;, (day,))
+    return {row[0] for row in rows}
+
+
+@dp.message(CommandStart())
+async def start(message: Message, state: FSMContext):
+    await state.set_state(Booking.service)
+    await message.answer(&quot;Hi! What would you like to book?&quot;,
+                         reply_markup=keyboard(SERVICES.items(), &quot;svc&quot;))
+
+
+@dp.callback_query(Booking.service, F.data.startswith(&quot;svc:&quot;))
+async def pick_service(call: CallbackQuery, state: FSMContext):
+    await state.update_data(service=call.data.split(&quot;:&quot;)[1])
+    days = [date.today() + timedelta(days=i) for i in range(1, 6)]
+    buttons = [(d.isoformat(), d.strftime(&quot;%a %d %b&quot;)) for d in days]
+    await state.set_state(Booking.day)
+    await call.message.edit_text(&quot;Pick a day:&quot;,
+                                 reply_markup=keyboard(buttons, &quot;day&quot;))
+
+
+@dp.callback_query(Booking.day, F.data.startswith(&quot;day:&quot;))
+async def pick_day(call: CallbackQuery, state: FSMContext):
+    day = call.data.split(&quot;:&quot;, 1)[1]
+    free = [h for h in HOURS if h not in taken(day)]
+    if not free:
+        return await call.answer(&quot;Fully booked, try another day&quot;,
+                                 show_alert=True)
+    await state.update_data(day=day)
+    await state.set_state(Booking.hour)
+    await call.message.edit_text(&quot;Pick a time:&quot;,
+                                 reply_markup=keyboard([(h, h) for h in free], &quot;hour&quot;))
+
+
+@dp.callback_query(Booking.hour, F.data.startswith(&quot;hour:&quot;))
+async def pick_hour(call: CallbackQuery, state: FSMContext):
+    hour = call.data.split(&quot;:&quot;, 1)[1]
+    data = await state.get_data()
+    if hour in taken(data[&quot;day&quot;]):
+        return await call.answer(&quot;Someone just took this slot&quot;,
+                                 show_alert=True)
+    name = call.from_user.full_name
+    db.execute(&quot;INSERT INTO bookings VALUES (?, ?, ?, ?, ?)&quot;,
+               (call.from_user.id, name, data[&quot;service&quot;], data[&quot;day&quot;], hour))
+    db.commit()
+    await state.clear()
+    text = f&quot;{SERVICES[data[&#x27;service&#x27;]]}\n{data[&#x27;day&#x27;]} at {hour}&quot;
+    await call.message.edit_text(f&quot;Booked! See you soon.\n\n{text}&quot;)
+    if OWNER_ID:
+        await call.bot.send_message(OWNER_ID, f&quot;New booking from {name}:\n{text}&quot;)
+
+
+async def main():
+    await dp.start_polling(Bot(os.environ[&quot;BOT_TOKEN&quot;]))
+
+
+if __name__ == &quot;__main__&quot;:
+    asyncio.run(main())
+</pre></section>
+</div>
+<script>
+{
+const chat=document.getElementById("chat");
+const S=["Стрижка","Борода","Комплекс"],D=["Сегодня","Завтра","Послезавтра"],H=["11:00","13:00","15:00","17:00"];
+let st={};
+const say=(t,me)=>{const d=document.createElement("div");d.className="m"+(me?" me":"");d.textContent=t;chat.appendChild(d)};
+const kb=(items,cb)=>{const k=document.createElement("div");k.className="kb";items.forEach(i=>{const b=document.createElement("button");b.textContent=i;b.onclick=()=>{k.remove();say(i,true);cb(i)};k.appendChild(b)});chat.appendChild(k)};
+const start=()=>{chat.innerHTML="";say("/start",true);say("Привет! Выберите услугу:");kb(S,s=>{st.s=s;say("Выберите день:");kb(D,d=>{st.d=d;say("Свободное время:");kb(H.filter((_,i)=>!(d==="Сегодня"&&i<2)),h=>{say("Готово! "+st.s+", "+st.d.toLowerCase()+" в "+h+".\nМастер получил уведомление.");kb(["Записаться ещё"],start)})})})};
+start();
+document.getElementById("cp").onclick=async e=>{const t=document.getElementById("src").textContent;try{await navigator.clipboard.writeText(t)}catch(_){const r=document.createRange();r.selectNodeContents(document.getElementById("src"));const s=getSelection();s.removeAllRanges();s.addRange(r);try{document.execCommand("copy")}catch(__){}}e.target.textContent="Скопировано";setTimeout(()=>e.target.textContent="Скопировать",1500)};
+}
+</script></body></html>

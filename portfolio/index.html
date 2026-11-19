@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Портфолио разработчика</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday: a working portfolio, calm and confident
+   IDEA a survey map: each project is a station on one magenta route
+   PICTURE the route map of projects, clickable stations, Окошко as the main terminal
+   COLOUR land #fbfbf2 ground, sea #bfe3ee fields, ink #13242e, magenta #d6127e route, contour brown #a8551b
+   TYPE Overpass 800 for titles, Overpass for text, system fallback offline
+   LAYOUT laptop: short intro band, then the map full width with a legend panel; phone: title, map, legend stacked */
+:root{color-scheme:light dark;--bg:light-dark(#fbfbf2,#0d1c24);--sea:light-dark(#bfe3ee,#123341);--ink:light-dark(#13242e,#e8f1f4);--mute:light-dark(#4d6470,#9fb6c0);--route:#d6127e;--brown:light-dark(#a8551b,#e0995f);--card:light-dark(#ffffff,#132a35);--line:light-dark(#d9dccb,#21424f)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html{scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Overpass,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip}
+a{color:inherit}
+.band{padding:clamp(28px,4vw,64px) max(5vw,16px)}
+.wrap{max-width:1240px;margin:0 auto}
+nav{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center;padding:12px max(5vw,16px)}
+nav b{font-weight:800;font-size:18px;margin-right:auto}
+nav a{text-decoration:none;color:var(--mute);font-weight:600}
+nav a:hover{color:var(--route)}
+h1{font-size:clamp(34px,5vw,52px);line-height:1.05;letter-spacing:-.02em;margin:0 0 14px;text-wrap:balance;font-weight:800}
+h2{font-size:clamp(28px,3.4vw,40px);line-height:1.05;letter-spacing:-.02em;margin:0 0 18px;font-weight:800}
+h3{font-size:20px;margin:0 0 6px}
+.lead{font-size:18px;color:var(--mute);max-width:62ch;margin:0}
+.intro{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:32px;align-items:end}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.fact{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.fact b{display:block;font-size:28px;font-weight:800;color:var(--route);line-height:1.1}
+.fact span{font-size:14px;color:var(--mute)}
+.mapband{background:var(--sea);padding:0}
+.map{display:grid;grid-template-columns:minmax(0,1fr) 340px;max-width:1240px;margin:0 auto}
+.fig{position:relative;min-height:520px}
+.fig svg{position:absolute;inset:0;width:100%;height:100%}
+.legend{background:var(--bg);margin:24px;border-radius:16px;padding:22px;border:1px solid var(--line);align-self:start}
+.legend h3{font-size:22px}
+.legend p{margin:6px 0 14px;color:var(--mute)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px;padding:0;list-style:none}
+.tags li{font-size:13px;border:1px solid var(--line);border-radius:20px;padding:3px 10px;color:var(--mute)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 20px;border-radius:12px;background:var(--route);color:#fff;text-decoration:none;font-weight:700;border:0;cursor:pointer;font:inherit;font-weight:700}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.btn:focus-visible,a:focus-visible,button:focus-visible{outline:3px solid var(--route);outline-offset:2px}
+.status{display:inline-block;font-size:13px;font-weight:700;border-radius:6px;padding:2px 8px;margin-bottom:8px}
+.st-live{background:#d6127e1f;color:var(--route)}.st-demo{background:color-mix(in srgb,var(--brown) 15%,transparent);color:var(--brown)}
+svg text{font:600 14px Overpass,system-ui,sans-serif;fill:var(--ink);paint-order:stroke;stroke:var(--sea);stroke-width:5px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:6px}
+.card p{margin:0;color:var(--mute);flex:1}
+.card .links{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.svc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 48px}
+.row{display:flex;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px dashed var(--line);font-size:17px}
+.row b{white-space:nowrap;color:var(--route)}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;counter-reset:s}
+.step{border-top:3px solid var(--brown);padding-top:12px}
+.step p{margin:4px 0 0;color:var(--mute)}
+.skills{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:16px 0 0}
+.skills li{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 12px;font-weight:600}
+.contact{background:var(--ink);color:var(--bg)}
+.contact .lead{color:color-mix(in srgb,var(--bg) 75%,transparent)}
+.contact .btn.ghost{color:var(--bg);border-color:var(--bg)}
+footer{padding:20px max(5vw,16px);color:var(--mute);font-size:14px}
+@media(max-width:900px){.map{grid-template-columns:minmax(0,1fr)}.legend{margin:0 16px 20px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.intro,.svc,.grid,.steps{grid-template-columns:minmax(0,1fr)}.facts{grid-template-columns:repeat(3,minmax(0,1fr))}.fig{min-height:420px}nav a{font-size:15px}}
+@media(prefers-reduced-motion:reduce){.train{display:none}}
+</style>
+</head>
+<body>
+<nav><div class="wrap"><b>Сайты и боты</b><a href="#map">Проекты</a><a href="#services">Услуги</a><a href="#process">Как работаю</a><a href="#contact">Связаться</a></div></nav>
+
+<header class="band"><div class="wrap intro">
+  <div>
+    <h1>Делаю сайты, Telegram-ботов и автоматизацию для малого бизнеса</h1>
+    <p class="lead">Python-разработчик. Мой основной проект - сервис онлайн-записи «Окошко»: бот, Mini App, веб-страница и админка, от кода до сервера. Ниже - он и демо-работы в разных сферах. Всё можно открыть и потрогать.</p>
+  </div>
+  <div class="facts">
+    <div class="fact"><b>1</b><span>запущенный сервис</span></div>
+    <div class="fact"><b>9</b><span>демо-проектов</span></div>
+    <div class="fact"><b>0 ₽</b><span>чтобы посмотреть: работают без сервера</span></div>
+  </div>
+</div></header>
+
+<section class="mapband" id="map"><div class="map">
+  <div class="fig" id="fig" role="img" aria-label="Карта проектов: станции на одном маршруте"><svg id="svg"></svg></div>
+  <aside class="legend" id="legend" aria-live="polite"></aside>
+</div></section>
+
+<section class="band"><div class="wrap">
+  <h2>Все проекты</h2>
+  <div class="grid" id="cards"></div>
+</div></section>
+
+<section class="band" id="services" style="background:var(--card)"><div class="wrap">
+  <h2>Услуги и цены</h2>
+  <div class="svc" id="svc"></div>
+  <p class="lead" style="margin-top:16px">Цена «от» - за базовый объём. Точную стоимость и сроки называю до начала работы.</p>
+  <ul class="skills"><li>Python</li><li>aiogram 3</li><li>FastAPI</li><li>SQLite</li><li>JavaScript</li><li>HTML/CSS</li><li>Telegram Mini Apps</li><li>Парсинг</li><li>Linux-серверы</li></ul>
+</div></section>
+
+<section class="band" id="process"><div class="wrap">
+  <h2>Как работаю</h2>
+  <div class="steps">
+    <div class="step"><h3>Обсуждаем задачу</h3><p>Что должно работать, для кого и к какому сроку. Консультация бесплатно.</p></div>
+    <div class="step"><h3>Фиксирую цену</h3><p>Называю стоимость и сроки до старта, без доплат по ходу.</p></div>
+    <div class="step"><h3>Показываю по ходу</h3><p>Промежуточные версии, чтобы правки были вовремя.</p></div>
+    <div class="step"><h3>Запускаю и передаю</h3><p>Размещаю на хостинге, отдаю код и инструкцию, помогаю с вопросами.</p></div>
+  </div>
+</div></section>
+
+<section class="band contact" id="contact"><div class="wrap">
+  <h2>Обсудим ваш проект</h2>
+  <p class="lead">Напишите на Kwork или Авито: опишите задачу в паре предложений, отвечу с оценкой сроков и стоимости.</p>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px">
+    <a class="btn" href="https://kwork.ru/user/asatrasatrasatr" target="_blank" rel="noopener">Профиль на Kwork</a>
+    <a class="btn ghost" href="https://www.avito.ru/moskva/predlozheniya_uslug/pomosch_programmista_oshibka_v_kode_skript_python_8412047090" target="_blank" rel="noopener">Авито: IT-offers</a>
+  </div>
+</div></section>
+<footer>Демо-проекты сделаны для портфолио: компании и данные в них вымышлены. «Окошко» - реальный работающий сервис.</footer>
+
+<script>
+{
+const P=[
+ {id:"okoshko",sh:"«Окошко»",t:"«Окошко»",s:"live",d:"Сервис онлайн-записи для салонов и барбершопов: Telegram-бот, Mini App, веб-страница записи, админка мастера, напоминания, рассылки, согласия по 152-ФЗ.",tags:["Python","FastAPI","aiogram 3","Mini App"],links:[["Локальная демо-копия","projects/booking.html"],["Живая демо","https://83-141-72-251.sslip.io/demo"]]},
+ {id:"shop",sh:"Магазин",t:"Интернет-магазин",s:"demo",d:"Каталог с поиском и фильтрами, карточки товаров, корзина, оформление заказа. Корзина сохраняется в браузере.",tags:["JavaScript","Корзина","Фильтры"],links:[["Открыть","projects/shop.html"]]},
+ {id:"crm",sh:"CRM",t:"Мини-CRM заявок",s:"demo",d:"Доска заявок: новые, в работе, готово. Перетаскивание, поиск, сумма по колонкам, всё хранится локально.",tags:["Kanban","Drag and drop"],links:[["Открыть","projects/crm.html"]]},
+ {id:"dash",sh:"Дашборд",t:"Дашборд продаж",s:"demo",d:"Выручка по дням, средний чек, лучшие товары и каналы. Графики рисуются без библиотек, есть фильтр периода.",tags:["SVG-графики","Аналитика"],links:[["Открыть","projects/dashboard.html"]]},
+ {id:"bot",sh:"Бот",t:"Telegram-бот записи",s:"demo",d:"Исходный код бота на aiogram 3: услуги, дни, свободные слоты, SQLite, уведомление владельцу. Меньше 100 строк.",tags:["aiogram 3","SQLite"],links:[["Смотреть код","projects/bot.html"]]},
+ {id:"barber",sh:"Барбершоп",t:"Лендинг барбершопа",s:"demo",d:"Тёмный стиль, цены, форма записи.",tags:["Лендинг"],links:[["Открыть","projects/landings/barber.html"]]},
+ {id:"coffee",sh:"Кофейня",t:"Лендинг кофейни",s:"demo",d:"Тёплая палитра, меню, заказ навынос.",tags:["Лендинг"],links:[["Открыть","projects/landings/coffee.html"]]},
+ {id:"lawyer",sh:"Юрист",t:"Сайт юриста",s:"demo",d:"Строгий деловой стиль, услуги, консультация.",tags:["Лендинг"],links:[["Открыть","projects/landings/lawyer.html"]]},
+ {id:"fitness",sh:"Фитнес",t:"Фитнес-студия",s:"demo",d:"Контрастный спортивный стиль, абонементы.",tags:["Лендинг"],links:[["Открыть","projects/landings/fitness.html"]]},
+ {id:"repair",sh:"Ремонт",t:"Ремонт квартир",s:"demo",d:"Светлый стиль, цены за м², расчёт стоимости.",tags:["Лендинг"],links:[["Открыть","projects/landings/repair.html"]]}
+];
+const SVC=[["Telegram-бот","от 3 000 ₽"],["Бот онлайн-записи","от 5 000 ₽"],["Лендинг под ключ","от 5 000 ₽"],["Сайт для бизнеса","от 15 000 ₽"],["Интернет-магазин","от 25 000 ₽"],["Парсер данных","от 2 000 ₽"],["Исправление ошибок в коде","от 500 ₽"],["Автоматизация и интеграции","от 2 990 ₽"]];
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const st=p=>`<span class="status ${p.s==="live"?"st-live":"st-demo"}">${p.s==="live"?"Работает":"Демо"}</span>`;
+const links=p=>p.links.map(([n,h],i)=>`<a class="btn${i?" ghost":""}" href="${h}">${esc(n)}</a>`).join("");
+document.getElementById("cards").innerHTML=P.map(p=>`<article class="card">${st(p)}<h3>${esc(p.t)}</h3><p>${esc(p.d)}</p><div class="links">${links(p)}</div></article>`).join("");
+document.getElementById("svc").innerHTML=SVC.map(([a,b])=>`<div class="row"><span>${a}</span><b>${b}</b></div>`).join("");
+let cur="okoshko";
+const legend=document.getElementById("legend");
+const show=id=>{cur=id;const p=P.find(x=>x.id===id);legend.innerHTML=`${st(p)}<h3>${esc(p.t)}</h3><p>${esc(p.d)}</p><ul class="tags">${p.tags.map(t=>`<li>${esc(t)}</li>`).join("")}</ul><div style="display:flex;gap:10px;flex-wrap:wrap">${links(p)}</div>`;draw();};
+const svg=document.getElementById("svg");
+let seed=7;const rnd=()=>(seed=seed*16807%2147483647)/2147483647;
+const draw=()=>{
+  const W=svg.clientWidth,H=svg.clientHeight;if(!W||!H)return;seed=7;
+  const narrow=W<520,m=narrow?40:70;
+  const n=P.length;
+  const pts=P.map((p,i)=>{const t=i/(n-1);const x=m+t*(W-2*m);const y=H*0.5+Math.sin(t*Math.PI*2.2)*(H*0.27)+(i%2?18:-18);return [x,y]});
+  let land="";
+  for(let k=0;k<5;k++){const cx=rnd()*W,cy=rnd()*H,r=80+rnd()*160;let rings="";for(let j=0;j<4;j++){rings+=`<ellipse cx="${cx}" cy="${cy}" rx="${r-j*22}" ry="${(r-j*22)*0.62}" fill="none" stroke="var(--brown)" stroke-opacity="${0.18+j*0.05}" stroke-width="1.2"/>`}land+=`<ellipse cx="${cx}" cy="${cy}" rx="${r+20}" ry="${(r+20)*0.62}" fill="var(--bg)" fill-opacity=".55"/>`+rings}
+  const d=pts.map((p,i)=>{if(!i)return `M${p[0]},${p[1]}`;const q=pts[i-1],mx=(q[0]+p[0])/2;return `C${mx},${q[1]} ${mx},${p[1]} ${p[0]},${p[1]}`}).join(" ");
+  const st=pts.map((p,i)=>{const pr=P[i],on=pr.id===cur,live=pr.s==="live",r=live?16:11;const lab=pr.sh;const ly=p[1]+(i%2?34:-24);
+    return `<g class="stn" data-id="${pr.id}" tabindex="0" role="button" aria-label="${esc(pr.t)}" style="cursor:pointer"><circle cx="${p[0]}" cy="${p[1]}" r="${r+8}" fill="transparent"/><circle cx="${p[0]}" cy="${p[1]}" r="${r}" fill="${on?"var(--route)":"var(--bg)"}" stroke="var(--route)" stroke-width="${live?6:4}"/>${live?`<circle cx="${p[0]}" cy="${p[1]}" r="5" fill="${on?"#fff":"var(--route)"}"/>`:""}<text x="${p[0]}" y="${ly}" text-anchor="middle">${esc(lab)}</text></g>`}).join("");
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+  svg.innerHTML=`${land}<path d="${d}" fill="none" stroke="var(--route)" stroke-width="6" stroke-linecap="round" opacity=".9"/><path id="rt" d="${d}" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="2 12" opacity=".7"/><circle class="train" r="7" fill="var(--ink)"><animateMotion dur="14s" repeatCount="indefinite"><mpath href="#rt"/></animateMotion></circle>${st}<text x="${W-16}" y="${H-16}" text-anchor="end" style="font-size:13px;fill:var(--mute)">Нажмите на станцию</text>`;
+};
+svg.addEventListener("click",e=>{const g=e.target.closest(".stn");if(g)show(g.dataset.id)});
+svg.addEventListener("keydown",e=>{const g=e.target.closest(".stn");if(g&&(e.key==="Enter"||e.key===" ")){e.preventDefault();show(g.dataset.id)}});
+const ro=new ResizeObserver(draw);ro.observe(svg);
+show("okoshko");
+}
+</script>
+</body>
+</html>

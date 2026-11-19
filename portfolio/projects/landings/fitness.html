@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PULSE - Фитнес-студия функционального тренинга (демо)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Arial Black', Arial, sans-serif;background:#0b0b12;color:#ffffff;line-height:1.5}
+.wrap{max-width:1120px;margin:0 auto;padding:0 32px}
+header{display:flex;justify-content:space-between;align-items:center;padding:26px 0}
+.logo{font-weight:800;font-size:26px;letter-spacing:1px} .logo span{color:#c6ff3d}
+nav a{color:#a8a8c0;text-decoration:none;margin-left:28px;font-size:15px}
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center;padding:56px 0 80px}
+.tag{display:inline-block;padding:6px 14px;border:1px solid #c6ff3d;color:#c6ff3d;border-radius:40px;font-size:13px;margin-bottom:22px}
+h1{font-size:54px;line-height:1.08;margin-bottom:22px}
+.lead{font-size:19px;color:#a8a8c0;max-width:520px;margin-bottom:34px}
+.btn{display:inline-block;background:#c6ff3d;color:#0b0b12;padding:16px 30px;border-radius:12px;font-weight:700;text-decoration:none;font-size:17px}
+.btn2{margin-left:14px;color:#ffffff;text-decoration:none;border-bottom:1px solid #a8a8c0;font-size:16px}
+.visual{height:400px;border-radius:28px;background:radial-gradient(circle at 30% 25%,#c6ff3dcc,transparent 55%),radial-gradient(circle at 75% 80%,#c6ff3d66,transparent 50%),#15152a;position:relative;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.25)}
+.card{position:absolute;left:28px;bottom:28px;right:28px;background:#0b0b12ee;border-radius:18px;padding:20px 22px;backdrop-filter:blur(6px)}
+.card b{display:block;font-size:18px;margin-bottom:4px} .card small{color:#a8a8c0}
+.stars{color:#c6ff3d;letter-spacing:2px}
+section{padding:70px 0} section.alt{background:#15152a}
+h2{font-size:36px;margin-bottom:34px}
+.feats{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.feat{background:#0b0b12;border-radius:20px;padding:28px;border:1px solid #c6ff3d33}
+.feat i{display:block;width:44px;height:44px;border-radius:12px;background:#c6ff3d;margin-bottom:18px;opacity:.9}
+.feat b{font-size:19px;display:block;margin-bottom:8px} .feat p{color:#a8a8c0}
+.prices{display:grid;grid-template-columns:1fr 1fr;gap:16px 48px}
+.row{display:flex;justify-content:space-between;border-bottom:1px dashed #a8a8c066;padding:14px 0;font-size:18px}
+.row span:last-child{color:#c6ff3d;font-weight:700}
+.cta{text-align:center;padding:80px 0} .cta p{color:#a8a8c0;margin:10px 0 30px}
+form{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+input{padding:16px 18px;border-radius:12px;border:1px solid #a8a8c066;background:#0b0b12;color:#ffffff;font-size:16px;width:260px}
+footer{padding:30px 0;color:#a8a8c0;font-size:14px;text-align:center;border-top:1px solid #a8a8c033}
+@media(max-width:820px){.hero,.feats,.prices{grid-template-columns:1fr} h1{font-size:38px} nav{display:none} .visual{height:280px}}
+</style></head><body><a href="../../index.html" style="display:block;background:#13242e;color:#fff;text-align:center;font:14px/1.4 system-ui,sans-serif;padding:6px;text-decoration:none;position:relative;z-index:99">← Демо-лендинг из портфолио, компания вымышленная. Вернуться к портфолио</a>
+<div class="wrap">
+<header><div class="logo">PULS<span>E</span></div><nav><a href="#feat">О нас</a><a href="#price">Абонементы</a><a href="#contact">Контакты</a></nav></header>
+<div class="hero"><div><div class="tag">Фитнес-студия функционального тренинга</div><h1>Тренировки в мини-группах<br>до 8 человек</h1><p class="lead">Тренер следит за техникой каждого. Первое занятие бесплатно.</p>
+<a class="btn" href="#contact">Пробное занятие</a><a class="btn2" href="#price">Абонементы</a></div>
+<div class="visual"><div class="card"><span class="stars">★★★★★</span><b>Мини-группы</b><small>Персональное внимание по цене группы.</small></div></div></div>
+</div>
+<section class="alt" id="feat"><div class="wrap"><h2>Почему выбирают нас</h2><div class="feats"><div class="feat"><i></i><b>Мини-группы</b><p>Персональное внимание по цене группы.</p></div><div class="feat"><i></i><b>Расписание с 7:00 до 22:00</b><p>Удобно до и после работы.</p></div><div class="feat"><i></i><b>Замеры каждый месяц</b><p>Видно прогресс в цифрах.</p></div></div></div></section>
+<section id="price"><div class="wrap"><h2>Абонементы</h2><div class="prices"><div class="row"><span>Разовое занятие</span><span>900 ₽</span></div><div class="row"><span>Абонемент 8 занятий</span><span>5 900 ₽</span></div><div class="row"><span>Безлимит на месяц</span><span>8 900 ₽</span></div><div class="row"><span>Персональная тренировка</span><span>2 500 ₽</span></div></div></div></section>
+<section class="alt cta" id="contact"><div class="wrap"><h2>Пробное занятие</h2><p>Оставьте телефон - перезвоним в течение 15 минут</p>
+<form onsubmit="event.preventDefault();this.innerHTML='<b>Спасибо! Это демо-версия сайта.</b>'"><input placeholder="Ваше имя"><input placeholder="+7 (___) ___-__-__"><button class="btn" style="border:0;cursor:pointer">Отправить</button></form></div></section>
+<footer>Демо-сайт (концепт) для портфолио. Компания и данные вымышлены.</footer>
+</body></html>
